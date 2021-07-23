@@ -57,9 +57,7 @@
                 <?php foreach ($review->reply as $comment) {  ?>
                 <div class="review-sub-comment">
                     <div class="review-sub-comment__avatar-thumb">
-                        <div class="avatar">
-                            <img src="http://affiliate.dominhhai.com/wp-content/uploads/2021/03/14708156_1861294444099532_8999849426570778930_n.jpg">
-                        </div>
+                        <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($comment->name);?></span></div>
                     </div>
                     <div class="review-sub-comment__inner">
                         <div class="review-sub-comment__avatar">

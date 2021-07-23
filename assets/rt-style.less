@@ -227,8 +227,24 @@
 					border-radius: 50%;
 					min-width: 32px;
 					.avatar {
+						position: relative;
+						padding-top: 100%;
+						background-color: var(--theme-color);
 						border-radius: 50%;
 						overflow: hidden;
+						span {
+							position: absolute;
+							inset: 0px;
+							display: flex;
+							-webkit-box-pack: center;
+							justify-content: center;
+							-webkit-box-align: center;
+							align-items: center;
+							font-size: 100%;
+							font-weight: 500;
+							color: #fff;
+							/* color: rgb(153, 153, 153); */
+						}
 					}
 				}
 				.review-sub-comment__inner {

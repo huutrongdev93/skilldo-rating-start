@@ -245,8 +245,24 @@
   min-width: 32px;
 }
 .review-comments .review-item .review-comment__sub-comments .review-sub-comment .review-sub-comment__avatar-thumb .avatar {
+  position: relative;
+  padding-top: 100%;
+  background-color: var(--theme-color);
   border-radius: 50%;
   overflow: hidden;
+}
+.review-comments .review-item .review-comment__sub-comments .review-sub-comment .review-sub-comment__avatar-thumb .avatar span {
+  position: absolute;
+  inset: 0px;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  font-size: 100%;
+  font-weight: 500;
+  color: #fff;
+  /* color: rgb(153, 153, 153); */
 }
 .review-comments .review-item .review-comment__sub-comments .review-sub-comment .review-sub-comment__inner {
   padding: 10px 12px;

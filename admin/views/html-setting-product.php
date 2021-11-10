@@ -62,14 +62,14 @@
             <div class="col-md-12">
                 <div class="select-img">
                     <div class="checkbox">
-                        <input style="opacity: 0;" id="rating_star_setting_template_product_form_template1" type="radio" name="rating_star_setting[template]" value="template1" <?php echo (rating_star::config('template.product_form') == 'template1') ? 'checked' : '';?>>
+                        <input style="opacity: 0;" id="rating_star_setting_template_product_form_template1" type="radio" name="rating_star_setting[template]" value="template1" <?php echo (rating_star::config('template') == 'template1') ? 'checked' : '';?>>
                         <label for="rating_star_setting_template_product_form_template1" class="">
                             <span>Giao diện 1</span>
                             <?php Template::img('https://user-images.githubusercontent.com/86478092/126191091-cd97efd1-bb86-4da2-b8a5-879525e43246.png', '', ['style' => 'max-width:500px']);?>
                         </label>
                     </div>
                     <div class="checkbox">
-                        <input style="opacity: 0;" id="rating_star_setting_template_product_form_template2" type="radio" name="rating_star_setting[template]" value="template2" <?php echo (rating_star::config('template.product_form') == 'template2') ? 'checked' : '';?>>
+                        <input style="opacity: 0;" id="rating_star_setting_template_product_form_template2" type="radio" name="rating_star_setting[template]" value="template2" <?php echo (rating_star::config('template') == 'template2') ? 'checked' : '';?>>
                         <label for="rating_star_setting_template_product_form_template2" class="">
                             <span>Giao diện 2</span>
                             <?php Template::img('https://user-images.githubusercontent.com/86478092/126294849-30c1d7ef-9661-4e90-92a3-8447248732d4.png', '', ['style' => 'max-width:500px']);?>

@@ -20,7 +20,7 @@
                 }
                 else {
                     $count_item_star = rating_star::count(['where' => ['star' => $i, 'object_type' => 'product', 'object_id' => $object->id]]);
-                    $percent = $count_item_star/$star*100;
+                    $percent = $count_item_star/count*100;
                 }
                 ?>
                 <div class="r">
@@ -157,6 +157,7 @@
         display: inline-block;
         margin: 0 10px;
         border-radius: 5px;
+        overflow: hidden;
     }
     .rating-star-form .rating-star-review .bgb .bgb-in {
         background-color: #f25800;

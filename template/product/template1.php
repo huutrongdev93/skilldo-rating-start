@@ -20,7 +20,7 @@
                 }
                 else {
                     $count_item_star = rating_star::count(['where' => ['star' => $i, 'object_type' => 'product', 'object_id' => $object->id]]);
-                    $percent = $count_item_star/count*100;
+                    $percent = $count_item_star/$count*100;
                 }
                 ?>
                 <div class="r">

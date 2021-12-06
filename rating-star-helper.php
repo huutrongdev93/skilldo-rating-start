@@ -50,7 +50,7 @@ Class Rating_Star_Product {
                         </span>
                     <?php } ?>
                 </div>
-                ( <?php echo $total_number_review;?> <?php echo __('đánh giá', 'rating_rate');?> )
+                <span class="star-count">( <?php echo $total_number_review;?> <?php echo __('đánh giá', 'rating_rate');?> )</span>
             </div>
         </div>
         <?php

@@ -28,14 +28,25 @@ Class Rating_Star_Admin {
 
             $object_id = InputBuilder::Get('object');
 
+            $status = InputBuilder::Get('status');
+
             $url = Url::admin('plugins?page=rating-star&p={page}');
 
             $review_in_page = 10;
 
             $args = [
+                'where_in' => [
+                    'field' => 'status',
+                    'data' => ['public', 'hiden']
+                ],
                 'where'  => [],
                 'params' => []
             ];
+
+            if($status == 'auto') {
+                unset($args['where_in']);
+                $args['where']['status'] = 'auto';
+            }
 
             if(!empty($star)) {
                 $args['where']['star'] = $star;
@@ -88,8 +99,9 @@ Class Rating_Star_Admin {
         }
         if(InputBuilder::get('view') == 'setting') {
             ?>
+            <button form="rating_star_setting_form" type="submit" class="btn btn-green"><?php echo Admin::icon('save');?> Lưu</button>
             <a href="<?php echo admin_url('plugins?page=rating-star');?>" class="btn btn-blue"><?php echo Admin::icon('back');?> Danh sách đánh giá</a>
-            <button form="rating_star_setting_form" type="submit" class="btn btn-green"><?php echo Admin::icon('save');?> Lưu</button><?php
+            <?php
         }
     }
     static public function actionDelete($res, $table, $id) {
@@ -116,6 +128,8 @@ Class Rating_Star_Admin_Product {
                 foreach ($ratings as $rating) {
 
                     $rating['object_id'] = $id;
+
+                    $rating['status'] = 'auto';
 
                     $error = rating_star::insert($rating);
 

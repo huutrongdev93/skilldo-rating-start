@@ -89,6 +89,7 @@
                             $('.js_review_btn__more').show();
                         }
                     }
+
                     $('.review-comments_content').html(response.review);
                     $('.review-comments_pagination').html(response.pagination);
                 }

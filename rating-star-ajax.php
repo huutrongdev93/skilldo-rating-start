@@ -18,7 +18,15 @@ Class Rating_Star_Ajax {
 
             $review_in_page = 3;
 
-            $args = ['where' => ['object_id'=> $id, 'object_type' => $type, 'status' => 'public'], 'params' => []];
+            $args = [
+                'where_in' => [
+                    'field' => 'status',
+                    'data' => ['public', 'auto']
+                ],
+                'where' => [
+                'object_id'     => $id,
+                'object_type'   => $type,
+            ], 'params' => []];
 
             if(!empty($sort)) {
                 if($sort == '1-star') $args['where']['star'] = 1;
@@ -67,7 +75,6 @@ Class Rating_Star_Ajax {
                     else {
                         Plugin::partial(RATING_STAR_NAME, 'rating-star-post-review-item', ['review' => $review, 'reply' => $reply]);
                     }
-
                     $result['review'] .= ob_get_contents();
                     ob_end_clean();
                 }
@@ -405,7 +412,7 @@ Class Rating_Star_Admin_Ajax {
 
             $rating['item_align']       = Str::clear($data['item_align']);
             $rating['item_position']    = (int)Str::clear($data['item_position']);
-            $rating['template']         = Str::clear($data['template']);
+            $rating['template']         = InputBuilder::post('template');
             $rating['reply']            = Str::clear($data['reply']);
             $rating['auto_enable']      = Str::clear($data['auto_enable']);
             $rating['auto_min_number']  = (int)Str::clear($data['auto_min_number']);
@@ -565,8 +572,7 @@ Class Rating_Star_Admin_Ajax {
         }
         echo json_encode($result);
     }
-    static public function statusSave($ci, $model)
-    {
+    static public function statusSave($ci, $model) {
 
         $result['status'] = 'error';
 

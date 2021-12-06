@@ -1,5 +1,10 @@
 <?php
 /*
+ * @version 4.1.0
+ * PHP 8 & hỗ trợ cms 5.0.0
+ */
+
+/*
  * @version 3.3.0
  * Bổ sung chức năng tự động tạo đánh giá
  */

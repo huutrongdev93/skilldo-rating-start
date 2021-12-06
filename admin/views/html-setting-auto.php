@@ -1,5 +1,5 @@
 <div class="box">
-    <div class="box-content">
+    <div class="box-content p10">
         <?php
         $Form
             ->add('rating_star_setting[auto_enable]', 'switch', ['label' => 'Bật / tắt tự động tạo đánh giá', 'note' => 'Tự động tạo đánh giá khi tạo mới sản phẩm' ], rating_star::config('auto_enable'))

@@ -58,6 +58,8 @@ class rating_star {
             $setting = array_merge($setting, $option);
         }
 
+        if(empty($option['template'])) $option['template'] = 'template2';
+
         if(isset($option['has_approving']))  $setting['has_approving'] = $option['has_approving'];
 
         if(isset($option['illegal_message']))  $setting['illegal_message'] = $option['illegal_message'];

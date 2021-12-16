@@ -412,7 +412,7 @@ Class Rating_Star_Admin_Ajax {
 
             $rating['item_align']       = Str::clear($data['item_align']);
             $rating['item_position']    = (int)Str::clear($data['item_position']);
-            $rating['template']         = InputBuilder::post('template');
+            $rating['template']         = Str::clear($data['template']);
             $rating['reply']            = Str::clear($data['reply']);
             $rating['auto_enable']      = Str::clear($data['auto_enable']);
             $rating['auto_min_number']  = (int)Str::clear($data['auto_min_number']);

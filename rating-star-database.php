@@ -14,6 +14,7 @@ Class Rating_Star_Database {
             `object_id` int(11) NOT NULL DEFAULT '0',
             `status` varchar(255) COLLATE utf8_unicode_ci NULL,
             `is_read` int(11) NOT NULL DEFAULT '0',
+	    `like` int(11) NOT NULL DEFAULT '0',
             `parent_id` int(11) NOT NULL DEFAULT '0',
             `user_id` int(11) NOT NULL DEFAULT '0',
             `order` int(11) NOT NULL DEFAULT '0',

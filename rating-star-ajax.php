@@ -18,43 +18,33 @@ Class Rating_Star_Ajax {
 
             $review_in_page = 3;
 
-            $args = [
-                'where_in' => [
-                    'field' => 'status',
-                    'data' => ['public', 'auto']
-                ],
-                'where' => [
-                'object_id'     => $id,
-                'object_type'   => $type,
-            ], 'params' => []];
+            $args = Qr::set('object_id', $id)->where('object_type', $type)->whereIn('status', ['public', 'auto']);
 
             if(!empty($sort)) {
-                if($sort == '1-star') $args['where']['star'] = 1;
-                if($sort == '2-star') $args['where']['star'] = 2;
-                if($sort == '3-star') $args['where']['star'] = 3;
-                if($sort == '4-star') $args['where']['star'] = 4;
-                if($sort == '5-star') $args['where']['star'] = 5;
+                if($sort == '1-star') $args->where('star', 1);
+                if($sort == '2-star') $args->where('star', 2);
+                if($sort == '3-star') $args->where('star', 3);
+                if($sort == '4-star') $args->where('star', 4);
+                if($sort == '5-star') $args->where('star', 5);
             }
             else {
-                $args['params']['orderby'] = 'star desc, created desc';
+                $args->orderBy('star', 'desc')->orderBy('created', 'desc');
             }
 
             $count = rating_star::count($args);
 
             if($count > 0) {
 
-                $config  = array (
-                    'current_page'  => ($page != 0) ? $page : 1, // Trang hiện tại
-                    'total_rows'    => $count, // Tổng số record
-                    'number'		=> $review_in_page,
+                $config  = [
+                    'currentPage'   => ($page != 0) ? $page : 1, // Trang hiện tại
+                    'totalRecords'  => $count, // Tổng số record
+                    'limit'		    => $review_in_page,
                     'url'           => '#review{page}',
-                );
+                ];
 
-                $pagination = new paging($config);
+                $pagination = new Pagination($config);
 
-                $args['params']['limit'] = $review_in_page;
-
-                $args['params']['start'] = $pagination->getoffset();
+                $args->limit($review_in_page)->offset($pagination->offset());
 
                 $reviews = rating_star::gets($args);
 
@@ -67,19 +57,24 @@ Class Rating_Star_Ajax {
                 if (rating_star::config('reply') == 'admin' && (!Auth::check() || !Auth::hasCap('loggin_admin'))) $reply = false;
 
                 foreach ($reviews as $review) {
-                    $review->reply = rating_star::gets(['where' => array('parent_id' => $review->id), 'object_type' => 'comment']);
+
+                    $review->reply = rating_star::gets(Qr::set('parent_id', $review->id)->where('object_type', 'comment'));
+
                     ob_start();
+
                     if($type == 'product') {
                         Plugin::partial(RATING_STAR_NAME, 'rating-star-product-review-item', ['review' => $review, 'reply' => $reply]);
                     }
                     else {
                         Plugin::partial(RATING_STAR_NAME, 'rating-star-post-review-item', ['review' => $review, 'reply' => $reply]);
                     }
+
                     $result['review'] .= ob_get_contents();
+
                     ob_end_clean();
                 }
 
-                $result['pagination']   = $pagination->html_fontend();
+                $result['pagination']   = $pagination->frontend();
 
                 $result['status'] = 'success';
             }
@@ -451,7 +446,9 @@ Class Rating_Star_Admin_Ajax {
 
             if (have_posts($rating_star)) {
 
-                $comments = rating_star::gets(['where' => array('parent_id' => $id), 'object_type' => 'comment']);
+
+
+                $comments = rating_star::gets(Qr::set('parent_id', $id)->where('object_type', 'comment'));
 
                 ob_start();
 
@@ -628,7 +625,7 @@ Class Rating_Star_Admin_Ajax {
 
                 if (!is_skd_error(rating_star::insert((array)$rating_star))) {
 
-                    update_metadata($rating_star->object_type, $rating_star->object_id, 'rating_star', $rating_star_product);
+                    Metadata::update($rating_star->object_type, $rating_star->object_id, 'rating_star', $rating_star_product);
 
                     $result['message'] = 'Cập nhật dữ liệu thành công';
 

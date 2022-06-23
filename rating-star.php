@@ -5,17 +5,17 @@ Plugin class    : rating_star
 Plugin uri      : http://sikido.vn
 Description     : Với ứng dụng Rating Star, bạn có thể thu được nhiều đánh giá hơn bất kì một cách thức nào khác. Chúng đã được duyệt kỹ lưỡng trước khi được hiển thị trên website của bạn
 Author          : Nguyễn Hữu Trọng
-Version         : 4.1.0
+Version         : 4.2.0
  */
-define( 'RATING_STAR_NAME',     'rating-star' );
+const RATING_STAR_NAME = 'rating-star';
 
-define( 'RATING_STAR_PATH',     Path::plugin( RATING_STAR_NAME ));
+const RATING_STAR_VERSION = '4.2.0';
 
-define( 'RATING_STAR_VERSION', '4.1.0' );
+define('RATING_STAR_PATH',  Path::plugin(RATING_STAR_NAME));
 
 class rating_star {
 
-    private $name = 'rating_star';
+    private string $name = 'rating_star';
 
     function __construct() {}
 
@@ -75,70 +75,40 @@ class rating_star {
         return $setting;
     }
 
-    static public function get($args = '') {
+    static public function handleParams($args = null) {
+        if(is_array($args)) {
 
-        $model = get_model('home')->settable('rating_star');
+            if(empty($args['object_type'])) {
+                $args['where']['object_type <>'] = 'comment';
+            } else {
+                $args['where']['object_type'] = $args['object_type'];
+            }
 
-        if(is_numeric($args)) {
-            $args = ['where' => array('id' => (int)$args)];
+            $query = Qr::convert($args);
         }
+        if(is_numeric($args)) $query = Qr::set('id', $args);
+        if($args instanceof Qr) $query = clone $args;
+        return (isset($query)) ? $query : null;
+    }
 
-        if(!have_posts($args)) return [];
-
-        $args = array_merge(array('where' => [], 'params' => []), $args );
-
-        $rating_star =  $model->get_data($args);
-
-        return $rating_star;
+    static public function get($args = '') {
+        $args = self::handleParams($args);
+        return model('rating_star')->get($args);
     }
 
     static public function gets($args = '') {
-
-        $model = get_model('home')->settable('rating_star');
-
-        if(is_numeric($args)) {
-            $args = ['where' => array('id' => (int)$args)];
-        }
-        if(!have_posts($args)) $args = [];
-
-        $args = array_merge(['where' => [], 'params' => []], $args);
-
-        if(empty($args['object_type'])) {
-            $args['where']['object_type <>'] = 'comment';
-        } else {
-            $args['where']['object_type'] = $args['object_type'];
-        }
-
-        $rating_star =  $model->gets_data($args);
-
-        return $rating_star;
+        $args = self::handleParams($args);
+        return model('rating_star')->gets($args);
     }
 
     static public function count($args = '') {
-
-        $model = get_model('home')->settable('rating_star');
-
-        if(is_numeric($args)) {
-            $args = ['where' => array('id' => (int)$args)];
-        }
-        if(!have_posts($args)) $args = [];
-
-        $args = array_merge(['where' => [], 'params' => []], $args);
-
-        if(empty($args['object_type'])) {
-            $args['where']['object_type <>'] = 'comment';
-        } else {
-            $args['where']['object_type'] = $args['object_type'];
-        }
-
-        $rating_star =  $model->count_data($args);
-
-        return $rating_star;
+        $args = self::handleParams($args);
+        return model('rating_star')->count($args);
     }
 
     static public function insert($rating_star = []) {
 
-        $model = get_model()->settable('rating_star');
+        $model = model('rating_star');
 
         if(!empty($rating_star['id'])) {
 
@@ -206,7 +176,7 @@ class rating_star {
 
         if( $update ) {
 
-            $model->settable('rating_star')->update_where( $data, compact('id' ));
+            $model->settable('rating_star')->update( $data, Qr::set($id));
 
             $rating_star_id = $id;
         }
@@ -214,7 +184,7 @@ class rating_star {
 
             $model->settable('rating_star');
 
-            $rating_star_id = $model->add( $data );
+            $rating_star_id = $model->add($data);
         }
 
         return $rating_star_id;
@@ -222,7 +192,7 @@ class rating_star {
 
     static public function delete($id = '') {
 
-        $model = get_model()->settable('rating_star');
+        $model = model('rating_star');
 
         $rating_star = static::get($id);
 
@@ -245,28 +215,19 @@ class rating_star {
                 }
             }
 
-            $model->settable('rating_star');
-
-            return $model->delete_where(['id' => $id]);
+            return $model->settable('rating_star')->delete(Qr::set($id));
         }
 
         return 0;
     }
 
     static public function deleteList($productID = []) {
-
         if(have_posts($productID)) {
-
-            $model      = get_model()->settable('rating_star');
-
-            foreach ($productID as $key => $id) {
-
+            foreach ($productID as $id) {
                 static::delete($id);
             }
-
             return $productID;
         }
-
         return false;
     }
 
@@ -292,7 +253,7 @@ class rating_star {
 
         $biasRandom->setData($dataNumberStar);
 
-        $service = 'http://cdn.sikido.vn';
+        $service = 'https://cdn.sikido.vn';
 
         $dataTemp = file_get_contents($service.'/star-ratings');
 

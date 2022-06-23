@@ -2,7 +2,8 @@
 Class Rating_Star_Admin {
     static public function navigation() {
         if(Auth::hasCap('rating_star')) {
-            $count = rating_star::count(['where' => ['is_read' => 0]]);
+
+            $count = rating_star::count(Qr::set('is_read',0));
             AdminMenu::add('rating-star', 'Đánh giá sao', 'plugins?page=rating-star', [
                 'icon' => '<img src="'.RATING_STAR_PATH.'/assets/images/rating-star.png">',
                 'callback' => 'Rating_Star_Admin::page',
@@ -34,53 +35,44 @@ Class Rating_Star_Admin {
 
             $review_in_page = 10;
 
-            $args = [
-                'where_in' => [
-                    'field' => 'status',
-                    'data' => ['public', 'hiden']
-                ],
-                'where'  => [],
-                'params' => []
-            ];
+            $args = Qr::set()->whereIn('status', ['public', 'hiden']);
 
             if($status == 'auto') {
-                unset($args['where_in']);
-                $args['where']['status'] = 'auto';
+                $args->removeWhere('status');
+                $args->where('status', 'auto');
             }
 
             if(!empty($star)) {
-                $args['where']['star'] = $star;
+                $args->where('star', $star);
                 $url .= '&star='.$star;
             }
 
             if(!empty($type)) {
-                $args['where']['object_type'] = $type;
+                $args->where('object_type', $type);
                 $url .= '&type='.$type;
             }
 
             if(!empty($object_id)) {
-                $args['where']['object_id'] = $object_id;
+                $args->where('object_id', $object_id);
                 $url .= '&object='.$object_id;
             }
 
             $count = rating_star::count($args);
 
             $config  = array (
-                'current_page'  => ($page != 0) ? $page : 1, // Trang hiện tại
-                'total_rows'    => $count, // Tổng số record
-                'number'		=> $review_in_page,
+                'currentPage'   => ($page != 0) ? $page : 1, // Trang hiện tại
+                'totalRecords'  => $count, // Tổng số record
+                'limit'		    => $review_in_page,
                 'url'           => $url,
             );
 
-            $pagination = new paging($config);
+            $pagination = new Pagination($config);
 
-            $args['params']['limit'] = $review_in_page;
-
-            $args['params']['start'] = $pagination->getoffset();
+            $args->limit($review_in_page)->offset($pagination->offset());
 
             $rating_stars = rating_star::gets($args);
 
-            get_model('plugins')->settable('rating_star')->update_where(['is_read' => 1], ['is_read' => 0]);
+            model('rating_star')->update(['is_read' => 1], Qr::set('is_read', 0));
 
             include RATING_STAR_PATH.'/admin/views/html-index.php';
         }
@@ -135,9 +127,9 @@ Class Rating_Star_Admin_Product {
 
                     if(!is_skd_error($error)) {
 
-                        $model = get_model()->settable('rating_star');
+                        $model = model('rating_star');
 
-                        $model->update_where(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))], ['id' => $error]);
+                        $model->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))], Qr::set($error));
 
                         if(rating_star::config('has_approving') == 0) {
 

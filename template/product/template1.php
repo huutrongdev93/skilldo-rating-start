@@ -79,6 +79,7 @@
                     <div class="form-group col-md-12 review-attach-box">
                         <div class="review-attach-text"><span class="btn-attach js_rating_star_insert_attach"><?php echo __('Gửi ảnh thực tế', 'rating_upload_image');?></span></div>
                         <div class="review-attach-list">
+                            <div class="review-attach-flex">
                             <?php for($i = 1; $i <= 5; $i++) {?>
                                 <div class="uploader">
                                     <div class="input-wrapper input-wrapper--button">
@@ -90,6 +91,7 @@
                                     </div>
                                 </div>
                             <?php } ?>
+                            </div>
                             <div class="clearfix"></div>
                             <div class="col-md-12">
                                 <p style="text-align: center; font-size: 12px; margin-top: 10px;"><?php echo __('Chỉ chấp nhận JPEG, JPG, PNG. Dung lượng không quá 2Mb mỗi hình', 'rating_upload_image_validation');?></p>
@@ -98,7 +100,7 @@
                     </div>
 
                     <div class="form-group col-md-12">
-                        <button type="submit" class="btn btn-theme btn-effect-default btn-block"><?php echo __('Gửi');?></button>
+                        <button type="submit" class="btn btn-theme btn-effect-default d-block" style="width: 100%;"><?php echo __('Gửi');?></button>
                     </div>
                 </div>
             </form>
@@ -225,11 +227,9 @@
         -webkit-background-size: 25px auto;
         cursor: pointer;
     }
-    .review-attach-list { overflow: hidden; display: none;}
+    .review-attach-list { display: none;}
+    .review-attach-flex { display: grid; grid-template-columns: repeat(5, 1fr); gap:10px;}
     .review-attach-list .uploader {
-        float: left;
-        margin-right: 10px;
-        margin-top: 10px;
         position: relative;
     }
     .review-attach-list .uploader input[type=file] { display: none;}

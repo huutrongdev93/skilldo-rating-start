@@ -37,19 +37,19 @@ Class Rating_Star_Update_Version {
 }
 Class Rating_Star_Update_Database {
     public static function Version_2_0_0($model) {
-        if(!$model->db_field_exists('is_read','rating_star')) {
+        if(!model()::schema()->hasColumn('rating_star', 'is_read')) {
             $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `is_read` INT NOT NULL DEFAULT '1' AFTER `status`;");
             $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `parent_id` INT NOT NULL DEFAULT '0' AFTER `status`;");
             $model->query("UPDATE `".CLE_PREFIX."rating_star` SET `is_read`= '1' WHERE 1;");
         }
     }
     public static function Version_3_0_0($model) {
-        if(!$model->db_field_exists('user_id','rating_star')) {
+        if(!model()::schema()->hasColumn('rating_star', 'user_id')) {
             $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `user_id` INT NOT NULL DEFAULT '0' AFTER `status`;");
         }
     }
     public static function Version_4_0_0($model) {
-        if(!$model->db_field_exists('like','rating_star')) {
+        if(!model()::schema()->hasColumn('rating_star', 'like')) {
             $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `like` INT NOT NULL DEFAULT '0' AFTER `user_id`;");
         }
         $rating = Option::get('rating_star_setting');

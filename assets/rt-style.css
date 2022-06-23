@@ -581,14 +581,14 @@
 }
 .review-post-star-ratings .review-stars .review-star .review-icon,
 .review-post-star-ratings:not(.review-disabled) .review-stars .review-star:hover ~ .review-star .review-icon {
-  background-image: url(https://wiki.tino.org/wp-content/plugins/kk-star-ratings/public/svg/inactive.svg);
+  background-image: url(views/plugins/rating-star/assets/images/inactive.svg);
 }
 .review-post-star-ratings .review-stars .review-stars-active .review-star .review-icon {
-  background-image: url(https://wiki.tino.org/wp-content/plugins/kk-star-ratings/public/svg/active.svg);
+  background-image: url(views/plugins/rating-star/assets/images/active.svg);
 }
 .review-post-star-ratings.review-disabled .review-stars .review-stars-active .review-star .review-icon,
 .review-post-star-ratings:not(.review-disabled) .review-stars:hover .review-star .review-icon {
-  background-image: url(https://wiki.tino.org/wp-content/plugins/kk-star-ratings/public/svg/selected.svg);
+  background-image: url(views/plugins/rating-star/assets/images/selected.svg);
 }
 .review-post-star-ratings .review-legend {
   margin-left: 0.75rem;

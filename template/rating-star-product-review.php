@@ -44,7 +44,7 @@
                         </div>
                         <?php } ?>
                         <div class="form-group col-md-12">
-                            <button type="submit" class="btn btn-theme btn-effect-default btn-block"><?php echo __('Gửi');?></button>
+                            <button type="submit" class="btn btn-theme btn-effect-default d-block"><?php echo __('Gửi');?></button>
                         </div>
                     </div>
                 </form>

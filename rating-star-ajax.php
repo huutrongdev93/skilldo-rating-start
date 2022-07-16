@@ -6,15 +6,15 @@ Class Rating_Star_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công';
 
-        if(InputBuilder::post()) {
+        if(Request::post()) {
 
-            $id     =  (int)InputBuilder::Post('object_id');
+            $id     =  (int)Request::Post('object_id');
 
-            $page     =  (int)InputBuilder::Post('page');
+            $page     =  (int)Request::Post('page');
 
-            $type   =  InputBuilder::Post('object_type');
+            $type   =  Request::Post('object_type');
 
-            $sort   =  InputBuilder::Post('sort');
+            $sort   =  Request::Post('sort');
 
             $review_in_page = 3;
 
@@ -31,7 +31,7 @@ Class Rating_Star_Ajax {
                 $args->orderBy('star', 'desc')->orderBy('created', 'desc');
             }
 
-            $count = rating_star::count($args);
+            $count = RatingStar::count($args);
 
             if($count > 0) {
 
@@ -46,28 +46,23 @@ Class Rating_Star_Ajax {
 
                 $args->limit($review_in_page)->offset($pagination->offset());
 
-                $reviews = rating_star::gets($args);
+                $reviews = RatingStar::gets($args);
 
                 $result['review'] = '';
 
                 $reply = true;
 
-                if (rating_star::config('reply') == 'login' && !Auth::check()) $reply = false;
+                if (RatingStar::config('reply') == 'login' && !Auth::check()) $reply = false;
 
-                if (rating_star::config('reply') == 'admin' && (!Auth::check() || !Auth::hasCap('loggin_admin'))) $reply = false;
+                if (RatingStar::config('reply') == 'admin' && (!Auth::check() || !Auth::hasCap('loggin_admin'))) $reply = false;
 
                 foreach ($reviews as $review) {
 
-                    $review->reply = rating_star::gets(Qr::set('parent_id', $review->id)->where('object_type', 'comment'));
+                    $review->reply = RatingStar::gets(Qr::set('parent_id', $review->id)->where('object_type', 'comment'));
 
                     ob_start();
 
-                    if($type == 'product') {
-                        Plugin::partial(RATING_STAR_NAME, 'rating-star-product-review-item', ['review' => $review, 'reply' => $reply]);
-                    }
-                    else {
-                        Plugin::partial(RATING_STAR_NAME, 'rating-star-post-review-item', ['review' => $review, 'reply' => $reply]);
-                    }
+                    Plugin::partial(RATING_STAR_NAME, 'review-item', ['type' => $type, 'review' => $review, 'reply' => $reply]);
 
                     $result['review'] .= ob_get_contents();
 
@@ -92,39 +87,31 @@ Class Rating_Star_Ajax {
         return true;
     }
     static public function reviewSave($ci, $model) {
-
         $result['status'] = 'error';
-
         $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if(InputBuilder::post()) {
-
-            $id = (int)InputBuilder::post('object_id');
-
-            $type = InputBuilder::post('object_type');
-
-            if($type == 'product') {
+        if(Request::post()) {
+            $id = (int)Request::post('object_id');
+            $type = Request::post('object_type');
+            if($type == 'products') {
                 $object = Product::get($id);
             }
             else {
                 $object = Posts::get($id);
             }
-
             if(!have_posts($object)) {
                 $result['message'] = 'Không có đối tượng để đánh giá';
                 echo json_encode($result);
                 return false;
             }
-
             $rating = [];
 
             $rating['object_id']    = $id;
 
             $rating['object_type']  = $type;
 
-            $rating['star'] = (int)InputBuilder::post('rating');
+            $rating['star'] = (int)Request::post('rating');
 
-            $rating['message']  = InputBuilder::post('rating_star_message');
+            $rating['message']  = Request::post('rating_star_message');
 
             if(Auth::check()) {
                 $user_current = Auth::user();
@@ -133,17 +120,17 @@ Class Rating_Star_Ajax {
                 $rating['user_id']        = $user_current->id;
             }
             else {
-                $rating['name']     = InputBuilder::post('rating_star_name');
-                $rating['email']    = InputBuilder::post('rating_star_email');
+                $rating['name']     = Request::post('rating_star_name');
+                $rating['email']    = Request::post('rating_star_email');
                 if($type == 'post' && empty($rating['name'])) {
                     $rating['name']    = 'guest';
                     $rating['email']   = 'guest_no_isset@empty';
-                    $rating['message'] =  'Đanh giá bài viết '.rating_star::starLabel($rating['star']);
+                    $rating['message'] =  'Đanh giá bài viết '.RatingStar::starLabel($rating['star']);
                 }
             }
 
             if($type == 'post' && empty($rating['message'])) {
-                $rating['message'] =  'Đanh giá bài viết '.rating_star::starLabel($rating['star']);
+                $rating['message'] =  'Đanh giá bài viết '.RatingStar::starLabel($rating['star']);
             }
 
             if(empty($rating['name'])) {
@@ -158,14 +145,14 @@ Class Rating_Star_Ajax {
                 return false;
             }
 
-            if(strlen($rating['message']) < 10) {
+            if(isset($rating['message']) && strlen($rating['message']) < 10) {
                 $result['message'] = 'Nội dung đánh giá quá ngắn.';
                 echo json_encode($result);
                 return false;
             }
 
             if(!empty($illegal_message)) {
-                $illegal_message = explode(',', rating_star::config('illegal_message'));
+                $illegal_message = explode(',', RatingStar::config('illegal_message'));
                 if (have_posts($illegal_message)) {
                     foreach ($illegal_message as $illegal) {
                         $illegal = trim($illegal);
@@ -184,11 +171,11 @@ Class Rating_Star_Ajax {
                 return false;
             }
 
-            $has_approving  = rating_star::config('has_approving');
+            $has_approving  = RatingStar::config('has_approving');
 
-            if($has_approving == 1) $rating['status'] = 'hiden';
+            if($has_approving == 1) $rating['status'] = 'hidden';
 
-            $id = rating_star::insert($rating);
+            $id = RatingStar::insert($rating);
 
             if(!is_skd_error($id)) {
 
@@ -280,13 +267,13 @@ Class Rating_Star_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công';
 
-        if(InputBuilder::post()) {
+        if(Request::post()) {
 
-            $data = InputBuilder::post();
+            $data = Request::post();
 
-            $id = (int)InputBuilder::post('id');
+            $id = (int)Request::post('id');
 
-            $rating_star = rating_star::get($id);
+            $rating_star = RatingStar::get($id);
 
             if(have_posts($rating_star)) {
 
@@ -299,7 +286,7 @@ Class Rating_Star_Ajax {
                     $rating['user_id']        = $user_current->id;
                 }
                 else {
-                    $rating['name'] = InputBuilder::post('rating_star_name');
+                    $rating['name'] = Request::post('rating_star_name');
 
                     if(empty($rating['name'])) {
                         $result['message'] = 'Không được để trống tên của bạn.';
@@ -307,7 +294,7 @@ Class Rating_Star_Ajax {
                         return false;
                     }
 
-                    $rating['email'] = InputBuilder::post('rating_star_email');
+                    $rating['email'] = Request::post('rating_star_email');
 
                     if(empty($rating['email'])) {
                         $result['message'] = 'Không được để trống email của bạn.';
@@ -325,7 +312,7 @@ Class Rating_Star_Ajax {
                 }
 
                 if(!empty($illegal_message)) {
-                    $illegal_message = explode(',', rating_star::config('illegal_message'));
+                    $illegal_message = explode(',', RatingStar::config('illegal_message'));
                     if (have_posts($illegal_message)) {
                         foreach ($illegal_message as $illegal) {
                             $illegal = trim($illegal);
@@ -348,7 +335,7 @@ Class Rating_Star_Ajax {
 
                 $rating['parent_id']    = $rating_star->id;
 
-                $id = rating_star::insert($rating);
+                $id = RatingStar::insert($rating);
 
                 if(!is_skd_error($id)) {
 
@@ -366,13 +353,13 @@ Class Rating_Star_Ajax {
     static public function reviewLike($ci, $model) {
         $result['status'] = 'error';
         $result['message'] = 'Lưu dữ liệu không thành công';
-        if(InputBuilder::post()) {
-            $id = (int)InputBuilder::post('id');
-            $rating_star = rating_star::get($id);
+        if(Request::post()) {
+            $id = (int)Request::post('id');
+            $rating_star = RatingStar::get($id);
             if(have_posts($rating_star)) {
                 $rating['id']    = $id;
                 $rating['like']  = $rating_star->like + 1;
-                $id = rating_star::insert($rating);
+                $id = RatingStar::insert($rating);
                 if(!is_skd_error($id)) {
                     $result['status'] = 'success';
                     $result['message'] = 'Cập nhật dữ liệu thành công.';
@@ -395,9 +382,9 @@ Class Rating_Star_Admin_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công.';
 
-        if (InputBuilder::post()) {
+        if (Request::post()) {
 
-            $data = InputBuilder::post('rating_star_setting');
+            $data = Request::post('rating_star_setting');
             $rating['product_enable']  = Str::clear($data['product_enable']);
             $rating['post_enable']     = Str::clear($data['post_enable']);
             $rating['has_approving']   = Str::clear($data['has_approving']);
@@ -438,17 +425,17 @@ Class Rating_Star_Admin_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công.';
 
-        if (InputBuilder::post()) {
+        if (Request::post()) {
 
-            $id = (int)InputBuilder::post('id');
+            $id = (int)Request::post('id');
 
-            $rating_star = rating_star::get($id);
+            $rating_star = RatingStar::get($id);
 
             if (have_posts($rating_star)) {
 
 
 
-                $comments = rating_star::gets(Qr::set('parent_id', $id)->where('object_type', 'comment'));
+                $comments = RatingStar::gets(Qr::set('parent_id', $id)->where('object_type', 'comment'));
 
                 ob_start();
 
@@ -490,13 +477,13 @@ Class Rating_Star_Admin_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công';
 
-        if (InputBuilder::post()) {
+        if (Request::post()) {
 
-            $data = InputBuilder::post();
+            $data = Request::post();
 
-            $id = (int)InputBuilder::post('id');
+            $id = (int)Request::post('id');
 
-            $rating_star = rating_star::get($id);
+            $rating_star = RatingStar::get($id);
 
             if (have_posts($rating_star)) {
 
@@ -529,7 +516,7 @@ Class Rating_Star_Admin_Ajax {
                     return false;
                 }
 
-                $id = rating_star::insert($rating);
+                $id = RatingStar::insert($rating);
 
                 if (!is_skd_error($id)) {
 
@@ -551,15 +538,15 @@ Class Rating_Star_Admin_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công.';
 
-        if (InputBuilder::post()) {
+        if (Request::post()) {
 
-            $id = (int)InputBuilder::post('id');
+            $id = (int)Request::post('id');
 
-            $rating_star = rating_star::get($id);
+            $rating_star = RatingStar::get($id);
 
             if (have_posts($rating_star)) {
 
-                if (rating_star::delete($id) != 0) {
+                if (RatingStar::delete($id) != 0) {
 
                     $result['message'] = 'Xóa dữ liệu thành công';
 
@@ -575,11 +562,11 @@ Class Rating_Star_Admin_Ajax {
 
         $result['message'] = 'Lưu dữ liệu không thành công.';
 
-        if (InputBuilder::post()) {
+        if (Request::post()) {
 
-            $id = (int)InputBuilder::post('id');
+            $id = (int)Request::post('id');
 
-            $rating_star = rating_star::get($id);
+            $rating_star = RatingStar::get($id);
 
             if (have_posts($rating_star)) {
 
@@ -623,7 +610,7 @@ Class Rating_Star_Admin_Ajax {
                     }
                 }
 
-                if (!is_skd_error(rating_star::insert((array)$rating_star))) {
+                if (!is_skd_error(RatingStar::insert((array)$rating_star))) {
 
                     Metadata::update($rating_star->object_type, $rating_star->object_id, 'rating_star', $rating_star_product);
 
@@ -636,34 +623,9 @@ Class Rating_Star_Admin_Ajax {
 
         echo json_encode($result);
     }
-    static public function delete($ci, $model) {
-
-        $result['status']   = 'error';
-
-        $result['message']  = 'Lưu dữ liệu không thành công.';
-
-        if(InputBuilder::post()) {
-
-            $id = (int)InputBuilder::post('id');
-
-            $rating_star = rating_star::get($id);
-
-            if(have_posts($rating_star)) {
-
-                if(rating_star::delete($id) != 0) {
-                    $result['message'] 	= 'Cập nhật dữ liệu thành công';
-                    $result['status'] 	= 'success';
-                }
-            }
-        }
-
-        echo json_encode($result);
-
-    }
 }
 Ajax::admin('Rating_Star_Admin_Ajax::settingSave');
 Ajax::admin('Rating_Star_Admin_Ajax::commentLoad');
 Ajax::admin('Rating_Star_Admin_Ajax::commentSave');
 Ajax::admin('Rating_Star_Admin_Ajax::commentDelete');
 Ajax::admin('Rating_Star_Admin_Ajax::statusSave');
-Ajax::admin('Rating_Star_Admin_Ajax::delete');

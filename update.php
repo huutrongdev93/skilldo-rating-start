@@ -14,10 +14,10 @@ add_action('admin_init', 'Rating_Star_update_core');
 
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion) {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0'];
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0'];
         $model          = get_model();
-        foreach ($listVersion as $version ) {
-            if(version_compare( $version, $DiscountVersion ) == 1) {
+        foreach ($listVersion as $version) {
+            if(version_compare($version, $DiscountVersion) == 1) {
                 $function = 'update_Version_'.str_replace('.','_',$version);
                 if(method_exists($this, $function)) $this->$function($model);
             }
@@ -33,6 +33,9 @@ Class Rating_Star_Update_Version {
     public function update_Version_4_0_0($model) {
         Rating_Star_Update_Files::Version_4_0_0($model);
         Rating_Star_Update_Database::Version_4_0_0($model);
+    }
+    public function update_Version_4_2_0($model) {
+        Rating_Star_Update_Database::Version_4_2_0($model);
     }
 }
 Class Rating_Star_Update_Database {
@@ -55,6 +58,9 @@ Class Rating_Star_Update_Database {
         $rating = Option::get('rating_star_setting');
         $rating['template'] = 'template1';
         Option::update('rating_star_setting', $rating);
+    }
+    public static function Version_4_2_0($model) {
+        $model->setTable('rating_star')->update(['object_type' => 'products'], Qr::set('object_type', 'product'));
     }
 }
 Class Rating_Star_Update_Files {

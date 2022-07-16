@@ -58,7 +58,8 @@
     $(function(){
         let page = 1;
         let sort = '';
-        let product_id = '<?php echo $object->id;?>';
+        let object_id = '<?php echo $object->id;?>';
+        let type = '<?php echo $type;?>';
         let review_id = 0;
         let liked = {};
         let isMobile = '<?php echo Device::isMobile();?>';
@@ -74,8 +75,8 @@
             let data = {
                 'action': 'Rating_Star_Ajax::reviewLoad',
                 'page'  : page,
-                'object_id' : product_id,
-                'object_type' : 'product',
+                'object_id' : object_id,
+                'object_type' : type,
                 'sort' : sort
             };
             $.post(ajax, data, function () { }, 'json').done(function (response) {

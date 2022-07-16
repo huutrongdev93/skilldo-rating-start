@@ -15,13 +15,15 @@
         <div style="flex-grow: 1;">
             <div class="review-comment__rating-title">
                 <div class="review-comment__rating">
-                    <?php Rating_star_product::template(1,$review->star, rating_star::config('color.star.detail'));?>
+                    <?php Rating_star_product::template(1,$review->star, RatingStar::config('color.star.detail'));?>
                 </div>
-                <a class="review-comment__title" href="javascript:void(0)"><?php echo rating_star::starLabel($review->star);?></a>
+                <a class="review-comment__title" href="javascript:void(0)"><?php echo RatingStar::starLabel($review->star);?></a>
             </div>
+            <?php if($type == 'products') {?>
             <div class="review-comment__seller-name-attributes">
                 <div class="review-comment__seller-name">Đã mua hàng <i class="fal fa-check"></i> từ shop</div>
             </div>
+            <?php } ?>
             <div class="review-comment__content"><?php echo $review->message;?></div>
             <div class="review-comment__images">
                 <?php

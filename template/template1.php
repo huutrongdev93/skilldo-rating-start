@@ -19,7 +19,7 @@
                     $count_item_star = 0; $percent = 0;
                 }
                 else {
-                    $count_item_star = rating_star::count(['where' => ['star' => $i, 'object_type' => 'product', 'object_id' => $object->id]]);
+                    $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
                     $percent = $count_item_star/$count*100;
                 }
                 ?>
@@ -27,7 +27,7 @@
                     <span class="t">
                         <?php for( $num = 0; $num < $i; $num++ ) {?><i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i><?php } ?><?php for( $num = 0; $num < (5-$i); $num++ ) {?><i class="fal fa-star" style="color:var(--star-color);"></i><?php } ?>
                     </span>
-                    <div class="bgb"> <div class="bgb-in" style="width: <?php echo $percent;?>%"></div> </div>
+                    <div class="bgb"><div class="bgb-in" style="width: <?php echo $percent;?>%"></div> </div>
                     <span class="c"><strong><b><?php echo $percent;?>%</b> | <?php echo $count_item_star;?></strong></span>
                 </div>
             <?php } ?>
@@ -36,14 +36,14 @@
             <div class="rating-reviews__success">
                 <div class="text-center">
                     <?php Template::img(Url::base(RATING_STAR_PATH.'/assets/images/success.png'));?>
-                    <p>Cám ơn bạn đã gửi đánh giá cho sản phẩm này! Đánh giá của bạn sẻ giúp chúng tôi cải thiện chất lượng dịch vụ hơn nữa.</p>
+                    <p>Cám ơn bạn đã gửi đánh giá cho chúng tôi! Đánh giá của bạn sẻ giúp chúng tôi cải thiện chất lượng dịch vụ hơn nữa.</p>
                 </div>
             </div>
             <form class="review-form" method="post" enctype="multipart/form-data" id="rating-reviews__form" autocomplete="off">
 
                 <input name="object_id" type="hidden" value="<?php echo $object->id;?>">
 
-                <input name="object_type" type="hidden" value="product">
+                <input name="object_type" type="hidden" value="<?php echo $type;?>">
 
                 <div class="rating">
                     <label class="selected">
@@ -73,7 +73,7 @@
                     </div>
                     <?php } ?>
                     <div class="form-group col-md-12">
-                        <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="<?php echo __('Hãy chia sẻ những điều bạn thích về sản phẩm này nhé', 'rating_placeholder_message');?>"></textarea>
+                        <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="<?php echo __('Hãy chia sẻ những điều bạn thích về '.$objectName.' này nhé', 'rating_placeholder_message');?>"></textarea>
                     </div>
 
                     <div class="form-group col-md-12 review-attach-box">
@@ -320,8 +320,9 @@
                 let fileUpload = input.files[0];
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    $('.uploader-review[for="'+number+'"]').html('<img src="'+e.target.result+'">');
-                    $('.uploader-review[for="'+number+'"]').closest('.uploader').addClass('insert-file');
+                    let uploaderReview = $('.uploader-review[for="'+number+'"]');
+                    uploaderReview.html('<img src="'+e.target.result+'">');
+                    uploaderReview.closest('.uploader').addClass('insert-file');
                 };
                 reader.readAsDataURL(fileUpload);
             }

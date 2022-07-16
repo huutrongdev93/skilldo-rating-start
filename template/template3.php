@@ -72,18 +72,17 @@
         let review = false;
         $('.review-post-star-ratings .review-stars-inactive .review-star').click(function(){
             if(review === true) {
-                show_message('Bạn đã đánh giá cho bài viết này', 'error');
+                show_message('Bạn đã đánh giá, không thể đánh giá lại', 'error');
                 return false;
             }
             review = true;
             let box = $(this).closest('.review-post-star-ratings');
             let data = {
                 'action'        : 'Rating_Star_Ajax::reviewSave',
-                'object_type'   : 'post',
+                'object_type'   : '<?php echo $type;?>',
                 'object_id'     : box.attr('data-id'),
                 'rating'        : $(this).attr('data-star'),
             };
-            data.action = 'Rating_Star_Ajax::reviewSave';
             $.post(ajax, data, function(){}, 'json').done(function(response){
                 show_message(response.message, response.status);
             });

@@ -19,7 +19,7 @@
                     $count_item_star = 0; $percent = 0;
                 }
                 else {
-                    $count_item_star = rating_star::count(['where' => ['star' => $i, 'object_type' => 'product', 'object_id' => $object->id]]);
+                    $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
                     $percent = ceil($count_item_star/$count*100);
                 }
                 ?>
@@ -35,7 +35,7 @@
         </div>
         <div class="rsr__right">
             <div class="row">
-                <div class="form-group col-md-12">
+                <div class="form-group col-md-12 text-center">
                     <p class="text-center"><span class="text">Có <?php echo $count;?> <?php echo __('đánh giá', 'rating_rate');?></span></p>
                     <button type="button" class="btn btn-theme btn-effect-default btn-block js_rating_star_btn__review"><?php echo __('Gửi đánh giá của bạn');?></button>
                 </div>
@@ -48,19 +48,19 @@
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
             <header class="modal__header">
-                <h2 class="modal__title">ĐÁNH GIÁ SẢN PHẨM</h2>
+                <h2 class="modal__title">ĐÁNH GIÁ <?php echo $objectName;?></h2>
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <div class="modal__content js_rating_star_modal__review">
                 <div class="rating-reviews__success">
                     <div class="text-center">
                         <?php Template::img(Url::base(RATING_STAR_PATH.'/assets/images/success.png'));?>
-                        <p>Cám ơn bạn đã gửi đánh giá cho sản phẩm này! Đánh giá của bạn sẻ giúp chúng tôi cải thiện chất lượng dịch vụ hơn nữa.</p>
+                        <p>Cám ơn bạn đã gửi đánh giá cho chúng tôi! Đánh giá của bạn sẻ giúp chúng tôi cải thiện chất lượng dịch vụ hơn nữa.</p>
                     </div>
                 </div>
                 <form class="review-form" method="post" enctype="multipart/form-data" id="rating-reviews__form" autocomplete="off">
                     <input name="object_id" type="hidden" value="<?php echo $object->id;?>">
-                    <input name="object_type" type="hidden" value="product">
+                    <input name="object_type" type="hidden" value="<?php echo $type;?>">
                     <div class="rating">
                         <label class="selected">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
@@ -220,7 +220,9 @@
         .rating-star-form .rating-star-review .rsr__right .bgb { width:46%;}
         .rating-star-form .rating-star-review .rsr__right a { margin-top:0px;}
     }
-
+    .rating_star_modal__review .modal__title {
+        text-transform:uppercase;
+    }
     .rating_star_modal__review .rating {
         text-align: center;
         unicode-bidi: bidi-override;
@@ -335,8 +337,9 @@
                 let fileUpload = input.files[0];
                 let reader = new FileReader();
                 reader.onload = function (e) {
-                    $('.uploader-review[for="'+number+'"]').html('<img src="'+e.target.result+'">');
-                    $('.uploader-review[for="'+number+'"]').closest('.uploader').addClass('insert-file');
+                    let uploaderReview = $('.uploader-review[for="'+number+'"]');
+                    uploaderReview.html('<img src="'+e.target.result+'">');
+                    uploaderReview.closest('.uploader').addClass('insert-file');
                 };
                 reader.readAsDataURL(fileUpload);
             }

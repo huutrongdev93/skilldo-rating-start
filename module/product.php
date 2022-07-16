@@ -1,13 +1,11 @@
 <?php
 Class Rating_Star_Product {
-
     function __construct() {
         add_action('product_detail_tabs', 'Rating_Star_Product::form', 30);
         add_action('product_detail_info', 'Rating_Star_Product::detail', 6);
-        add_action('product_object_info', 'Rating_Star_Product::object', rating_star::config('item_position') );
+        add_action('product_object_info', 'Rating_Star_Product::object', RatingStar::config('item_position') );
     }
-
-    static public function object($object) {
+    static function object($object): void {
 
         $rating_star_data = Product::getMeta($object->id, 'rating_star', true);
 
@@ -18,12 +16,8 @@ Class Rating_Star_Product {
         if( $total_number_review != 0 ) $total_star = round($total_star/$total_number_review);
 
         static::template($total_number_review, $total_star);
-
-        return true;
     }
-
-    static public function detail($object) {
-
+    static function detail($object): void {
         $rating_star_data = Product::getMeta($object->id, 'rating_star', true);
 
         $total_star     = (isset($rating_star_data['star'])) ? $rating_star_data['star'] : 0;
@@ -54,17 +48,16 @@ Class Rating_Star_Product {
             </div>
         </div>
         <?php
-
-        return true;
     }
-
-    static public function form($object) {
+    static function form($object): void {
 
         $rating_star_data = Product::getMeta($object->id, 'rating_star', true);
 
         $data = [
+            'type'   => 'products',
+            'objectName' => 'sản phẩm',
             'object' => $object,
-            'config' => rating_star::config(),
+            'config' => RatingStar::config(),
             'star'   => (isset($rating_star_data['star'])) ? $rating_star_data['star'] : 0,
             'count'  => (isset($rating_star_data['count'])) ? $rating_star_data['count'] : 0,
             'form'   => [
@@ -75,19 +68,16 @@ Class Rating_Star_Product {
 
         if($data['count'] != 0) $data['star'] = round($data['star']/$data['count']);
 
-        Plugin::partial(RATING_STAR_NAME, 'product/'.rating_star::config('template'), $data);
+        Plugin::partial(RATING_STAR_NAME, RatingStar::config('template'), $data);
 
-        Plugin::partial(RATING_STAR_NAME, 'rating-star-product-review', $data);
-
-        return true;
+        Plugin::partial(RATING_STAR_NAME, 'review', $data);
     }
-
-    static public  function template($total_count, $total_star) {
+    static function template($total_count, $total_star): void {
         ?>
         <div class="skd-product-reviews-star" style="text-align:var(--star-align)!important;">
             <div class="product-reviews__inner" style="display: inline-block; text-align: left">
                 <?php for( $i = 0; $i < 5; $i++ ) {?>
-                    <span>
+                <span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
                         <path fill="none" fill-rule="evenodd" stroke="var(--star-color)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                     </svg>
@@ -106,70 +96,79 @@ Class Rating_Star_Product {
         </div>
         <?php
     }
-}
-
-Class Rating_star_post {
-
-    function __construct() {
-        add_action('the_content', 'Rating_star_post::form', 99);
+    static function get($args = null) {
+        return Product::get($args);
     }
+}
+if(RatingStar::config('product_enable') == 1) {
+    new Rating_Star_Product();
+}
+Class Rating_Star_Admin_Product {
+    static public function randomRatingStar($id, $module) {
 
-    static public function object($object) {
+        if($module == 'products' && RatingStar::config('auto_enable') == 1) {
 
-        $rating_star_data = Posts::getMeta($object->id, 'rating_star', true);
+            $ratings = RatingStar::random();
+
+            if(have_posts($ratings)) {
+
+                foreach ($ratings as $rating) {
+
+                    $rating['object_id'] = $id;
+
+                    $rating['status'] = 'auto';
+
+                    $error = RatingStar::insert($rating);
+
+                    if(!is_skd_error($error)) {
+
+                        $model = model('rating_star');
+
+                        $model->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))], Qr::set($error));
+
+                        if(RatingStar::config('has_approving') == 0) {
+
+                            $rating_star_product = Product::getMeta($id, 'rating_star', true);
+
+                            if(!have_posts($rating_star_product)) {
+
+                                $rating_star_product = ['count' => 0, 'star'  => 0];
+                            }
+
+                            $rating_star_product['count'] += 1;
+
+                            $rating_star_product['star']  += $rating['star'];
+
+                            Product::updateMeta($id, 'rating_star', $rating_star_product);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    static public function addColumnTitle($item) {
+
+        $rating_star_data = Product::getMeta($item->id, 'rating_star', true);
 
         $total_star     = (isset($rating_star_data['star'])) ? $rating_star_data['star'] : 0;
 
         $total_number_review    = (isset($rating_star_data['count'])) ? $rating_star_data['count'] : 0;
 
         if( $total_number_review != 0 ) $total_star = round($total_star/$total_number_review);
-
-        static::template($total_number_review, $total_star);
-
-        return true;
-    }
-
-    static public function form($content) {
-
-        if(Template::isPage('post_detail')) {
-
-            $object = get_object_current();
-
-            $rating_star_data = Posts::getMeta($object->id, 'rating_star', true);
-
-            $data = [
-                'object' => $object,
-                'config' => rating_star::config(),
-                'star'   => (isset($rating_star_data['star'])) ? $rating_star_data['star'] : 0,
-                'count'  => (isset($rating_star_data['count'])) ? $rating_star_data['count'] : 0,
-            ];
-
-            if($data['count'] != 0) $data['star'] = round($data['star']/$data['count']);
-
-            ob_start();
-
-            Plugin::partial(RATING_STAR_NAME, 'rating-star-post-form', $data);
-
-            $content .= ob_get_contents();
-
-            ob_end_clean();
-        }
-
-        return $content;
-    }
-
-    static public  function template($total_count, $total_star) {
         ?>
-        <div class="skd-product-reviews-star" style="color: var(--star-color);margin-bottom:10px;height: 11px;font-size:13px;">
-            <?php if($total_star != 0) { ?>
+        <div class="skd-product-detail-reviews-star" style="text-align:left;color:#fd9a42; margin:5px 0; font-size:10px;">
+            <a href="<?php echo Url::admin('plugins?page=rating-star&object='.$item->id.'&type=product');?>">
                 <?php for( $i = 0; $i < $total_star; $i++ ) {?>
-                    <i class="fa fa-star" aria-hidden="true" style="color:var(--star-color); font-weight: bold;"></i>&nbsp;
+                    <i class="fas fa-star" aria-hidden="true" style="color:#fd9a42; font-weight: bold;"></i>&nbsp
                 <?php } ?>
                 <?php for( $i = 0; $i < (5 - $total_star); $i++ ) {?>
                     <i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i>&nbsp;
                 <?php } ?>
-            <?php } ?>
+                ( <?php echo $total_number_review;?> <?php echo __('đánh giá', 'rating_rate');?> )
+            </a>
         </div>
         <?php
     }
 }
+add_action('save_object_add', 'Rating_Star_Admin_Product::randomRatingStar', 10, 2);
+add_action('admin_product_table_column_title', 'Rating_Star_Admin_Product::addColumnTitle', 10);

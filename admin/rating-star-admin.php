@@ -15,7 +15,7 @@ Class Rating_Star_Admin {
             ]);
 
             foreach ($module as $moduleKey => $item) {
-                AdminMenu::addSub('rating-star', $moduleKey, $item['name'], 'plugins?page=rating-star&type='.$moduleKey, [
+                AdminMenu::addSub('rating-star', $moduleKey, $item['name'], 'plugins?page=rating-star&object_type='.$moduleKey, [
                     'callback' => 'Rating_Star_Admin::page',
                 ]);
             }
@@ -34,15 +34,15 @@ Class Rating_Star_Admin {
 
             $type = Request::get('type');
 
-            if(empty($type)) $type = 'products';
+            $object_type = Request::get('object_type');
 
-            $module = Rating_star::module($type);
+            if(empty($object_type)) $object_type = 'products';
+
+            $module = Rating_star::module($object_type);
 
             if(!empty($module)) {
 
                 $object_id = Request::get('object');
-
-                $status = Request::get('status');
 
                 $url = Url::admin('plugins?page=rating-star&p={page}');
 
@@ -50,9 +50,11 @@ Class Rating_Star_Admin {
 
                 $args = Qr::set()->whereIn('status', ['public', 'hidden']);
 
-                if ($status == 'auto') {
-                    $args->removeWhere('status');
-                    $args->where('status', 'auto');
+                if (!empty($type)) {
+                    $args->where('type', $type);
+                }
+                else {
+                    $args->where('type', 'handmade');
                 }
 
                 if (!empty($star)) {
@@ -60,9 +62,9 @@ Class Rating_Star_Admin {
                     $url .= '&star=' . $star;
                 }
 
-                if (!empty($type)) {
-                    $args->where('object_type', $type);
-                    $url .= '&type=' . $type;
+                if (!empty($object_type)) {
+                    $args->where('object_type', $object_type);
+                    $url .= '&type=' . $object_type;
                 }
 
                 if (!empty($object_id)) {

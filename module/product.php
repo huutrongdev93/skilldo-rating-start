@@ -116,7 +116,9 @@ Class Rating_Star_Admin_Product {
 
                     $rating['object_id'] = $id;
 
-                    $rating['status'] = 'auto';
+                    $rating['status'] = 'public';
+
+                    $rating['type'] = 'auto';
 
                     $error = RatingStar::insert($rating);
 
@@ -169,6 +171,25 @@ Class Rating_Star_Admin_Product {
         </div>
         <?php
     }
+    static public function delete($productID) {
+
+        if(is_numeric($productID)) $productID = [$productID];
+
+        $rating_star = RatingStar::gets(Qr::set('object_type', 'products')->whereIn('object_id', $productID));
+
+        if(have_posts($rating_star)) {
+            $listID = [];
+            foreach ($rating_star as $item) {
+                $listID[] = $item->id;
+                Metadata::delete($item->object_type, $item->object_id, 'rating_star');
+            }
+            //Delete comments
+            model('rating_star')->delete(Qr::set('object_type', 'comment')->whereIn('parent_id', $listID));
+            model('rating_star')->delete(Qr::set()->whereIn('id', $listID));
+        }
+    }
 }
 add_action('save_object_add', 'Rating_Star_Admin_Product::randomRatingStar', 10, 2);
 add_action('admin_product_table_column_title', 'Rating_Star_Admin_Product::addColumnTitle', 10);
+add_action('delete_product_success', 'Rating_Star_Admin_Product::delete', 10);
+add_action('delete_products_list_success', 'Rating_Star_Admin_Product::delete', 10);

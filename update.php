@@ -14,7 +14,7 @@ add_action('admin_init', 'Rating_Star_update_core');
 
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion) {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0'];
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0'];
         $model          = get_model();
         foreach ($listVersion as $version) {
             if(version_compare($version, $DiscountVersion) == 1) {
@@ -36,6 +36,9 @@ Class Rating_Star_Update_Version {
     }
     public function update_Version_4_2_0($model) {
         Rating_Star_Update_Database::Version_4_2_0($model);
+    }
+    public function update_Version_4_3_0($model) {
+        Rating_Star_Update_Database::Version_4_3_0($model);
     }
 }
 Class Rating_Star_Update_Database {
@@ -61,6 +64,16 @@ Class Rating_Star_Update_Database {
     }
     public static function Version_4_2_0($model) {
         $model->setTable('rating_star')->update(['object_type' => 'products'], Qr::set('object_type', 'product'));
+    }
+    public static function Version_4_3_0($model) {
+        if(!model()::schema()->hasColumn('rating_star', 'type')) {
+
+            model()::schema()->table('rating_star', function($table) {
+                $table->string('type', '100')->default('handmade');
+            });
+
+            $model->setTable('rating_star')->update(['type' => 'auto', 'status' => 'public'], Qr::set('status', 'auto'));
+        }
     }
 }
 Class Rating_Star_Update_Files {

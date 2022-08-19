@@ -22,88 +22,71 @@ class RatingStar extends Model {
         return (isset($query)) ? $query : null;
     }
 
-    static public function insert($rating_star = []) {
+    static public function insert($insertData = []) {
 
         $model = model('rating_star');
 
-        if(!empty($rating_star['id'])) {
+        $columnsTable = [
+            'name'          => ['string'],
+            'email'         => ['string'],
+            'title'         => ['string'],
+            'message'       => ['string'],
+            'star'          => ['int', 0],
+            'object_type'   => ['string', 'products'],
+            'object_id'     => ['int', 0],
+            'is_read'       => ['int', 0],
+            'parent_id'     => ['int', 0],
+            'status'        => ['string', 'public'],
+            'type'          => ['string', 'handmade'],
+            'user_id'       => ['int', 0],
+            'like'          => ['int', 0],
+        ];
 
-            $id 		   = (int) $rating_star['id'];
+        $columnsTable = apply_filters('columns_db_'.self::$table, $columnsTable);
+
+        if(!empty($insertData['id'])) {
+
+            $id 		   = (int) $insertData['id'];
 
             $update 	   = true;
 
-            $old_rating_star = RatingStar::get($id);
+            $oldObject = RatingStar::get($id);
 
-            if (!$old_rating_star) return new SKD_Error( 'invalid_rating_star_id', __( 'ID đanh giá sao không chính xác.' ));
-
-            $rating_star['name'] = (isset($rating_star['name'])) ? $rating_star['name'] : $old_rating_star->name;
-            $rating_star['email'] = (isset($rating_star['email'])) ? $rating_star['email'] : $old_rating_star->email;
-            $rating_star['title'] = (isset($rating_star['title'])) ? $rating_star['title'] : $old_rating_star->title;
-            $rating_star['message'] = (isset($rating_star['message'])) ? $rating_star['name'] : $old_rating_star->message;
-            $rating_star['star'] = (isset($rating_star['star'])) ? $rating_star['star'] : $old_rating_star->star;
-            $rating_star['object_type'] = (isset($rating_star['object_type'])) ? $rating_star['object_type'] : $old_rating_star->object_type;
-            $rating_star['object_id'] = (isset($rating_star['object_id'])) ? $rating_star['object_id'] : $old_rating_star->object_id;
-            $rating_star['is_read'] = (isset($rating_star['is_read'])) ? $rating_star['is_read'] : $old_rating_star->is_read;
-            $rating_star['parent_id'] = (isset($rating_star['parent_id'])) ? $rating_star['parent_id'] : $old_rating_star->parent_id;
-            $rating_star['status'] = (isset($rating_star['status'])) ? $rating_star['status'] : $old_rating_star->status;
-            $rating_star['user_id'] = (isset($rating_star['user_id'])) ? $rating_star['user_id'] : $old_rating_star->user_id;
-            $rating_star['like'] = (isset($rating_star['like'])) ? $rating_star['like'] : $old_rating_star->like;
-            $rating_star['created'] = (isset($rating_star['created'])) ? $rating_star['created'] : $old_rating_star->created;
+            if (!$oldObject) return new SKD_Error( 'invalid_rating_star_id', __( 'ID đanh giá sao không chính xác.' ));
         }
         else {
-
             $update = false;
         }
 
-        $name   = (isset($rating_star['name'])) ? Str::clear($rating_star['name']) : '';
+        $insertData = createdDataInsert($columnsTable, $insertData, (isset($oldObject)) ? $oldObject : null);
 
-        $email  = (isset($rating_star['email'])) ? Str::clear($rating_star['email']) : '';
+        foreach ($columnsTable as $columnsKey => $columnsValue ) {
+            ${$columnsKey}  = $insertData[$columnsKey];
+        }
 
-        $title  = (isset($rating_star['title'])) ? Str::clear($rating_star['title']) : '';
-
-        $message    = (isset($rating_star['message'])) ? Str::clear($rating_star['message']) : '';
-
-        $star       = (isset($rating_star['star'])) ? (int)Str::clear($rating_star['star']) : '';
-
-        $object_type = (isset($rating_star['object_type'])) ? Str::clear($rating_star['object_type']) : 'products';
-
-        $object_id      = (isset($rating_star['object_id'])) ? (int)Str::clear($rating_star['object_id']) : 0;
-
-        $is_read        = (isset($rating_star['is_read'])) ? (int)Str::clear($rating_star['is_read']) : 0;
-
-        $parent_id      = (isset($rating_star['parent_id'])) ? (int)Str::clear($rating_star['parent_id']) : 0;
-
-        $like           = (isset($rating_star['like'])) ? (int)Str::clear($rating_star['like']) : 0;
-
-        $status         = empty( $rating_star['status'] ) ? 'public' : Str::clear($rating_star['status']);
-
-        $created         = empty($rating_star['created']) ? '' : Str::clear($rating_star['created']);
-
-        $user_id = 0;
-
-        if(isset($rating_star['user_id'])) {
-            $user_id = (int)Str::clear($rating_star['user_id']);
+        if(!empty($insertData['user_id'])) {
+            $user_id = (int)Str::clear($insertData['user_id']);
         }
         else if(Auth::check()) {
             $user_id = Auth::userID();
         }
 
-        $data = compact('name', 'email', 'title', 'message', 'star', 'object_type', 'object_id', 'status', 'is_read', 'parent_id', 'user_id', 'created', 'like');
+        $data = compact(array_keys($columnsTable));
 
-        if( $update ) {
+        $data = apply_filters('pre_insert_'.static::$table.'_data', $data, $insertData, $update ? $oldObject : null);
 
-            $model->settable('rating_star')->update( $data, Qr::set($id));
+        $model->settable('rating_star');
 
-            $rating_star_id = $id;
+        if($update) {
+            $data['updated'] = gmdate('Y-m-d H:i:s', time() + 7*3600);
+            $model->update( $data, Qr::set($id));
         }
-        else{
-
-            $model->settable('rating_star');
-
-            $rating_star_id = $model->add($data);
+        else {
+            $data['created'] = gmdate('Y-m-d H:i:s', time() + 7*3600);
+            $id = $model->add($data);
         }
 
-        return $rating_star_id;
+        return $id;
     }
 
     static public function delete($id = '') {
@@ -129,6 +112,8 @@ class RatingStar extends Model {
 
                     Metadata::update($rating_star->object_type, $rating_star->object_id, 'rating_star', $count_rating_star);
                 }
+
+                model('rating_star')->delete(Qr::set('object_type', 'comment')->where('parent_id', $id));
             }
 
             $model->settable('rating_star')->delete(Qr::set($id));

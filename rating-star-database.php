@@ -14,6 +14,7 @@ Class Rating_Star_Database {
                 $table->integer('object_id')->default(0);
                 $table->string('object_type', 200)->collate('utf8mb4_unicode_ci');
                 $table->string('status', 200)->collate('utf8mb4_unicode_ci');
+                $table->string('type', 100)->collate('utf8mb4_unicode_ci')->default('handmade');
                 $table->integer('is_read')->default(0);
                 $table->integer('parent_id')->default(0);
                 $table->integer('user_id')->default(0);

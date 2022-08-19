@@ -574,7 +574,7 @@ Class Rating_Star_Admin_Ajax {
 
                 if ($status == 'public') {
 
-                    $rating_star->status = 'hiden';
+                    $rating_star->status = 'hidden';
 
                     $result['status'] = '<span class="label label-danger">Ẩn</span>';
 
@@ -590,7 +590,7 @@ Class Rating_Star_Admin_Ajax {
                     }
                 }
 
-                if ($status == 'hiden') {
+                if ($status == 'hidden') {
 
                     $rating_star->status = 'public';
 

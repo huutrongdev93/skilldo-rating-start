@@ -14,7 +14,7 @@ add_action('admin_init', 'Rating_Star_update_core');
 
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion) {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0'];
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0'];
         $model          = get_model();
         foreach ($listVersion as $version) {
             if(version_compare($version, $DiscountVersion) == 1) {
@@ -39,6 +39,9 @@ Class Rating_Star_Update_Version {
     }
     public function update_Version_4_3_0($model) {
         Rating_Star_Update_Database::Version_4_3_0($model);
+    }
+    public function update_Version_4_4_0($model) {
+        Rating_Star_Update_Files::Version_4_4_0($model);
     }
 }
 Class Rating_Star_Update_Database {
@@ -85,6 +88,19 @@ Class Rating_Star_Update_Files {
             'template/rating-star-product-form.php',
             'template/rating-star-post-review.php',
             'template/rating-star-post-review-item.php',
+        ];
+        foreach ($Files as $file) {
+            if(file_exists($path.$file)) {
+                unlink($path.$file);
+            }
+        }
+    }
+    public static function Version_4_4_0($model) {
+        $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
+        $Files = [
+            'admin/views/html-setting.php',
+            'admin/views/html-setting-default.php',
+            'admin/views/html-setting-auto.php',
         ];
         foreach ($Files as $file) {
             if(file_exists($path.$file)) {

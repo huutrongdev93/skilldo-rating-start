@@ -376,50 +376,7 @@ Ajax::client('Rating_Star_Ajax::reviewReply');
 Ajax::client('Rating_Star_Ajax::reviewLike');
 
 Class Rating_Star_Admin_Ajax {
-    static public function settingSave($ci, $model) {
-
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $data = Request::post('rating_star_setting');
-            $rating['product_enable']  = Str::clear($data['product_enable']);
-            $rating['post_enable']     = Str::clear($data['post_enable']);
-            $rating['has_approving']   = Str::clear($data['has_approving']);
-            $rating['color']           = add_magic_quotes($data['color']);
-            $rating['illegal_message'] = trim(Str::clear($data['illegal_message']));
-            $rating['illegal_message'] = trim($rating['illegal_message'], ',');
-
-            $rating['item_align']       = Str::clear($data['item_align']);
-            $rating['item_position']    = (int)Str::clear($data['item_position']);
-            $rating['template']         = Str::clear($data['template']);
-            $rating['reply']            = Str::clear($data['reply']);
-            $rating['auto_enable']      = Str::clear($data['auto_enable']);
-            $rating['auto_min_number']  = (int)Str::clear($data['auto_min_number']);
-            $rating['auto_max_number']  = (int)Str::clear($data['auto_max_number']);
-            $rating['auto_percent_5']   = (int)Str::clear($data['auto_percent_5']);
-            $rating['auto_percent_4']   = (int)Str::clear($data['auto_percent_4']);
-            $rating['auto_percent_3']   = (int)Str::clear($data['auto_percent_3']);
-
-            if ($rating['auto_min_number'] > $rating['auto_max_number']) {
-                $result['message'] = 'Số đánh giá nhỏ nhất tạo ra không thể lớn hơn số đánh giá lớn nhất.';
-                echo json_encode($result);
-                return false;
-            }
-
-            Option::update('rating_star_setting', $rating);
-
-            $result['message'] = 'Cập nhật dữ liệu thành công';
-
-            $result['status'] = 'success';
-        }
-
-        echo json_encode($result);
-    }
-    static public function commentLoad($ci, $model)
-    {
+    static public function commentLoad($ci, $model) {
 
         $result['status'] = 'error';
 
@@ -624,7 +581,6 @@ Class Rating_Star_Admin_Ajax {
         echo json_encode($result);
     }
 }
-Ajax::admin('Rating_Star_Admin_Ajax::settingSave');
 Ajax::admin('Rating_Star_Admin_Ajax::commentLoad');
 Ajax::admin('Rating_Star_Admin_Ajax::commentSave');
 Ajax::admin('Rating_Star_Admin_Ajax::commentDelete');

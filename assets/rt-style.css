@@ -353,6 +353,10 @@
   vertical-align: middle;
   line-height: 12px;
 }
+.skd-product-reviews-star .product-reviews__inner span svg {
+  width: 12px;
+  height: 12px;
+}
 .skd-product-reviews-star .product-reviews__inner > div {
   white-space: nowrap;
   overflow: hidden;

@@ -14,7 +14,7 @@ add_action('admin_init', 'Rating_Star_update_core');
 
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion) {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0'];
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2'];
         $model          = get_model();
         foreach ($listVersion as $version) {
             if(version_compare($version, $DiscountVersion) == 1) {
@@ -42,6 +42,9 @@ Class Rating_Star_Update_Version {
     }
     public function update_Version_4_4_0($model) {
         Rating_Star_Update_Files::Version_4_4_0($model);
+    }
+    public function update_Version_4_4_2($model) {
+        Rating_Star_Update_Database::Version_4_4_2($model);
     }
 }
 Class Rating_Star_Update_Database {
@@ -76,6 +79,12 @@ Class Rating_Star_Update_Database {
             });
 
             $model->setTable('rating_star')->update(['type' => 'auto', 'status' => 'public'], Qr::set('status', 'auto'));
+        }
+    }
+
+    public static function Version_4_4_2($model) {
+        if(!model()::schema()->hasColumn('rating_star', 'like')) {
+            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `like` INT NOT NULL DEFAULT '0' AFTER `user_id`;");
         }
     }
 }

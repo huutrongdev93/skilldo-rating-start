@@ -129,6 +129,10 @@ Class Rating_Star_Ajax {
                 }
             }
 
+            if(empty($rating['email']) && !empty(Request::post('email'))) {
+                $rating['email'] = trim(Request::post('email'));
+            }
+
             if($type == 'post' && empty($rating['message'])) {
                 $rating['message'] =  'Đanh giá bài viết '.RatingStar::starLabel($rating['star']);
             }
@@ -174,6 +178,16 @@ Class Rating_Star_Ajax {
             $has_approving  = RatingStar::config('has_approving');
 
             if($has_approving == 1) $rating['status'] = 'hidden';
+
+            $errors = apply_filters('rating_star_save_error', [], $rating);
+
+            if(is_skd_error($errors)) {
+                foreach ($errors->errors as $error_key => $error_value) {
+                    $result['message'] = $error_value[0];
+                }
+                echo json_encode($result);
+                return false;
+            }
 
             $id = RatingStar::insert($rating);
 
@@ -250,6 +264,8 @@ Class Rating_Star_Ajax {
 
                     Metadata::update($type, $rating['object_id'], 'rating_star', $rating_star_product);
                 }
+
+                do_action('rating_star_save_success', $id, $rating);
 
                 $result['status'] = 'success';
 
@@ -398,20 +414,20 @@ Class Rating_Star_Admin_Ajax {
 
                 foreach ($comments as $comment) {
                     ?>
-                    <div class="rating-star-comment-item">
-                        <div class="rating-star-comment__main" style="position: relative">
-                            <div class="rating-star-comment__main_top">
-                                <p class="name" itemprop="author"><?php echo $comment->name; ?></p>
-                            </div>
-                            <div class="rating-star-comment__message">
+					<div class="rating-star-comment-item">
+						<div class="rating-star-comment__main" style="position: relative">
+							<div class="rating-star-comment__main_top">
+								<p class="name" itemprop="author"><?php echo $comment->name; ?></p>
+							</div>
+							<div class="rating-star-comment__message">
                                 <?php echo $comment->message; ?>
-                            </div>
-                            <div class="rating-star-comment__action" style="position: absolute; right:0; top:10px;">
-                                <button class="btn btn-red js_comment__btn_delete"
-                                        data-id="<?php echo $comment->id; ?>"><?php echo admin_button_icon('delete'); ?></button>
-                            </div>
-                        </div>
-                    </div>
+							</div>
+							<div class="rating-star-comment__action" style="position: absolute; right:0; top:10px;">
+								<button class="btn btn-red js_comment__btn_delete"
+								        data-id="<?php echo $comment->id; ?>"><?php echo admin_button_icon('delete'); ?></button>
+							</div>
+						</div>
+					</div>
                     <?php
                 }
 

@@ -13,7 +13,12 @@ Class Rating_Star_Product {
 
         $total_number_review    = (isset($rating_star_data['count'])) ? $rating_star_data['count'] : 0;
 
-        if( $total_number_review != 0 ) $total_star = round($total_star/$total_number_review);
+        if($total_number_review != 0) {
+            $total_star = round($total_star/$total_number_review);
+        }
+        else {
+            $total_star = 5;
+        }
 
         static::template($total_number_review, $total_star);
     }

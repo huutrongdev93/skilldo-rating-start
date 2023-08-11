@@ -375,7 +375,8 @@ Class Rating_Star_Ajax {
 
         return true;
     }
-    static public function reviewLike($ci, $model) {
+    static public function reviewLike($ci, $model): bool
+    {
         $result['status'] = 'error';
         $result['message'] = 'Lưu dữ liệu không thành công';
         if(Request::post()) {

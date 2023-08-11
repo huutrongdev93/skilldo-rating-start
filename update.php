@@ -16,7 +16,7 @@ add_action('admin_init', 'Rating_Star_update_core');
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion): void
     {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2'];
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2', '4.5.0'];
         $model          = get_model();
         foreach ($listVersion as $version) {
             if(version_compare($version, $DiscountVersion) == 1) {

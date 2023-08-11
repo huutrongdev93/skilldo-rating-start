@@ -1,0 +1,177 @@
+.tabs {
+  overflow-x: auto;
+  font-weight: 500;
+  white-space: nowrap;
+  display: flex;
+}
+.tabs .btn-tab {
+  border: 2px solid #fff;
+  background-color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tabs .btn-tab.active {
+  border-bottom-color: var(--theme-color);
+}
+.review-item-info {
+  font-size: 14px;
+}
+.review-item-info .review-item-avatar {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+}
+.review-item-info .review-item-avatar .avatar {
+  position: relative;
+  padding-top: 100%;
+  background-color: var(--theme-color);
+  border-radius: 50%;
+  overflow: hidden;
+}
+.review-item-info .review-item-avatar .avatar span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  font-size: 100%;
+  font-weight: 500;
+  color: #fff;
+}
+.review-item-info .review-item-user .name {
+  font-weight: bold;
+}
+.review-item-info .review-item-user .time {
+  font-size: 12px;
+}
+.review-item-info .review-item-comment {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #374151;
+}
+.review-item-info .review-item-object {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  overflow: hidden;
+}
+.reply-item {
+  font-size: 14px;
+  background-color: #f9fafb;
+  border-radius: 5px;
+  padding: 10px;
+  margin-left: 50px;
+  border: 1px solid transparent;
+}
+.reply-item.active {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.reply-item .reply-avatar {
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+}
+.reply-item .reply-avatar .avatar {
+  position: relative;
+  padding-top: 100%;
+  background-color: rgba(107, 114, 128, 0.5);
+  border-radius: 50%;
+  overflow: hidden;
+}
+.reply-item .reply-avatar .avatar span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  font-size: 100%;
+  font-weight: 500;
+  color: #fff;
+}
+.reply-item .reply-content {
+  width: 100%;
+}
+.reply-item .reply-user .name {
+  font-weight: bold;
+}
+.reply-item .reply-user .time {
+  font-size: 12px;
+}
+.reply-item .reply-comment {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #374151;
+}
+.reply-item .reply-action {
+  display: flex;
+  justify-content: flex-end;
+}
+.reply-item .reply-action .btn {
+  font-size: 10px;
+}
+.created-reply {
+  color: var(--theme-color);
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+.table-responsive table.table {
+  min-width: 1000px;
+}
+.table-responsive table.table .rating-star-item.is_read td {
+  background-color: #f6f6f6;
+}
+.table-responsive table.table .rating-star-item .badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  height: 24px;
+}
+.table-responsive table.table .rating-star-item .badge-red {
+  background-color: #fef1f1;
+  color: #dc2828;
+  border-color: #dc2828;
+}
+.table-responsive table.table .rating-star-item .badge-green {
+  background-color: #f2fdf5;
+  color: #16a249;
+  border-color: #16a249;
+}
+.table-responsive table.table .rating-star-item .badge-yellow {
+  background-color: #fefce7;
+  color: #c88a04;
+  border-color: #c88a04;
+}
+.table-responsive table.table .js_column_action .btn {
+  font-size: 12px;
+  margin-left: 0;
+}
+.heading {
+  font-weight: bold;
+  font-size: 18px;
+}
+/*# sourceMappingURL=style.admin.css.map */

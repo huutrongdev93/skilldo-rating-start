@@ -1,7 +1,8 @@
 <?php
 if(!Admin::is()) return;
-function Rating_Star_update_core() {
-    if(Admin::is() && Auth::check() ) {
+function Rating_Star_update_core(): void
+{
+    if(Admin::is() && Auth::check()) {
         $version = Option::get('rating_star_version');
         $version = (empty($version)) ? '3.3.0' : $version;
         if (version_compare(RATING_STAR_VERSION, $version) === 1) {
@@ -13,7 +14,8 @@ function Rating_Star_update_core() {
 add_action('admin_init', 'Rating_Star_update_core');
 
 Class Rating_Star_Update_Version {
-    public function runUpdate($DiscountVersion) {
+    public function runUpdate($DiscountVersion): void
+    {
         $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2'];
         $model          = get_model();
         foreach ($listVersion as $version) {
@@ -24,27 +26,38 @@ Class Rating_Star_Update_Version {
         }
         Option::update('rating_star_version', RATING_STAR_VERSION );
     }
-    public function update_Version_2_0_0($model) {
+    public function update_Version_2_0_0($model): void
+    {
         Rating_Star_Update_Database::Version_2_0_0($model);
     }
-    public function update_Version_3_0_0($model) {
+    public function update_Version_3_0_0($model): void
+    {
         Rating_Star_Update_Database::Version_3_0_0($model);
     }
-    public function update_Version_4_0_0($model) {
+    public function update_Version_4_0_0($model): void
+    {
         Rating_Star_Update_Files::Version_4_0_0($model);
         Rating_Star_Update_Database::Version_4_0_0($model);
     }
-    public function update_Version_4_2_0($model) {
+    public function update_Version_4_2_0($model): void
+    {
         Rating_Star_Update_Database::Version_4_2_0($model);
     }
-    public function update_Version_4_3_0($model) {
+    public function update_Version_4_3_0($model): void
+    {
         Rating_Star_Update_Database::Version_4_3_0($model);
     }
-    public function update_Version_4_4_0($model) {
+    public function update_Version_4_4_0($model): void
+    {
         Rating_Star_Update_Files::Version_4_4_0($model);
     }
-    public function update_Version_4_4_2($model) {
+    public function update_Version_4_4_2($model): void
+    {
         Rating_Star_Update_Database::Version_4_4_2($model);
+    }
+    public function update_Version_4_5_0($model): void
+    {
+        Rating_Star_Update_Files::Version_4_5_0();
     }
 }
 Class Rating_Star_Update_Database {
@@ -89,7 +102,8 @@ Class Rating_Star_Update_Database {
     }
 }
 Class Rating_Star_Update_Files {
-    public static function Version_4_0_0($model) {
+    static function Version_4_0_0($model): void
+    {
         $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
         $Files = [
             'admin/rating-star-update.php',
@@ -104,12 +118,25 @@ Class Rating_Star_Update_Files {
             }
         }
     }
-    public static function Version_4_4_0($model) {
+    static function Version_4_4_0($model): void
+    {
         $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
         $Files = [
             'admin/views/html-setting.php',
             'admin/views/html-setting-default.php',
             'admin/views/html-setting-auto.php',
+        ];
+        foreach ($Files as $file) {
+            if(file_exists($path.$file)) {
+                unlink($path.$file);
+            }
+        }
+    }
+    static function Version_4_5_0(): void
+    {
+        $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
+        $Files = [
+            'rating-star.png',
         ];
         foreach ($Files as $file) {
             if(file_exists($path.$file)) {

@@ -1,7 +1,7 @@
 <?php
 Class Rating_Star_Ajax {
-    static public function reviewLoad($ci, $model) {
-
+    static public function reviewLoad($ci, $model): bool
+    {
         $result['status'] = 'error';
 
         $result['message'] = 'Lưu dữ liệu không thành công';
@@ -86,38 +86,47 @@ Class Rating_Star_Ajax {
 
         return true;
     }
-    static public function reviewSave($ci, $model) {
+    static public function reviewSave($ci, $model): bool
+    {
         $result['status'] = 'error';
         $result['message'] = 'Lưu dữ liệu không thành công.';
         if(Request::post()) {
-            $id = (int)Request::post('object_id');
-            $type = Request::post('object_type');
-            if($type == 'products') {
-                $object = Product::get($id);
+
+            $id     = (int)Request::post('object_id');
+
+            $type   = Request::post('object_type');
+
+            $module = Rating_Star::module($type);
+
+            if(empty($module)) {
+                $result['message'] = 'Loại đánh giá này chưa được đăng ký';
+                echo json_encode($result);
+                return false;
             }
-            else {
-                $object = Posts::get($id);
-            }
+
+            $object = $module['class']::get($id);
+
             if(!have_posts($object)) {
                 $result['message'] = 'Không có đối tượng để đánh giá';
                 echo json_encode($result);
                 return false;
             }
+
             $rating = [];
 
             $rating['object_id']    = $id;
 
             $rating['object_type']  = $type;
 
-            $rating['star'] = (int)Request::post('rating');
+            $rating['star']         = (int)Request::post('rating');
 
-            $rating['message']  = Request::post('rating_star_message');
+            $rating['message']      = Request::post('rating_star_message');
 
             if(Auth::check()) {
-                $user_current = Auth::user();
-                $rating['name']           = $user_current->firstname.' '.$user_current->lastname;
-                $rating['email']          = $user_current->email;
-                $rating['user_id']        = $user_current->id;
+                $user_current       = Auth::user();
+                $rating['name']     = $user_current->firstname.' '.$user_current->lastname;
+                $rating['email']    = $user_current->email;
+                $rating['user_id']  = $user_current->id;
             }
             else {
                 $rating['name']     = Request::post('rating_star_name');
@@ -177,7 +186,7 @@ Class Rating_Star_Ajax {
 
             $has_approving  = RatingStar::config('has_approving');
 
-            if($has_approving == 1) $rating['status'] = 'hidden';
+            if($has_approving == 1) $rating['status'] = 'pending';
 
             $errors = apply_filters('rating_star_save_error', [], $rating);
 
@@ -390,214 +399,3 @@ Ajax::client('Rating_Star_Ajax::reviewLoad');
 Ajax::client('Rating_Star_Ajax::reviewSave');
 Ajax::client('Rating_Star_Ajax::reviewReply');
 Ajax::client('Rating_Star_Ajax::reviewLike');
-
-Class Rating_Star_Admin_Ajax {
-    static public function commentLoad($ci, $model) {
-
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
-
-            $rating_star = RatingStar::get($id);
-
-            if (have_posts($rating_star)) {
-
-
-
-                $comments = RatingStar::gets(Qr::set('parent_id', $id)->where('object_type', 'comment'));
-
-                ob_start();
-
-                foreach ($comments as $comment) {
-                    ?>
-					<div class="rating-star-comment-item">
-						<div class="rating-star-comment__main" style="position: relative">
-							<div class="rating-star-comment__main_top">
-								<p class="name" itemprop="author"><?php echo $comment->name; ?></p>
-							</div>
-							<div class="rating-star-comment__message">
-                                <?php echo $comment->message; ?>
-							</div>
-							<div class="rating-star-comment__action" style="position: absolute; right:0; top:10px;">
-								<button class="btn btn-red js_comment__btn_delete"
-								        data-id="<?php echo $comment->id; ?>"><?php echo admin_button_icon('delete'); ?></button>
-							</div>
-						</div>
-					</div>
-                    <?php
-                }
-
-                $result['html'] = ob_get_contents();
-
-                ob_end_clean();
-
-                $result['status'] = 'success';
-
-                $result['message'] = 'Load dữ liệu thành công.';
-            }
-        }
-
-        echo json_encode($result);
-    }
-    static public function commentSave($ci, $model)
-    {
-
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công';
-
-        if (Request::post()) {
-
-            $data = Request::post();
-
-            $id = (int)Request::post('id');
-
-            $rating_star = RatingStar::get($id);
-
-            if (have_posts($rating_star)) {
-
-                $user_current = Auth::user();
-
-                $rating['name'] = Str::clear($data['comment_name']);
-
-                $rating['email'] = $user_current->email;
-
-                $rating['message'] = Str::clear($data['comment']);
-
-                $rating['object_id'] = $rating_star->object_id;
-
-                $rating['object_type'] = 'comment';
-
-                $rating['status'] = 'public';
-
-                $rating['star'] = 0;
-
-                $rating['parent_id'] = $rating_star->id;
-
-                if (empty($rating['message'])) {
-                    $result['message'] = 'Không được để trống câu trả lời của bạn.';
-                    echo json_encode($result);
-                    return false;
-                }
-                if (strlen($rating['message']) < 10) {
-                    $result['message'] = 'Nội dung trả lời quá ngắn.';
-                    echo json_encode($result);
-                    return false;
-                }
-
-                $id = RatingStar::insert($rating);
-
-                if (!is_skd_error($id)) {
-
-                    $result['status'] = 'success';
-
-                    $result['message'] = 'Đăng câu trả lời thành công.';
-                }
-            }
-        }
-
-        echo json_encode($result);
-
-        return true;
-    }
-    static public function commentDelete($ci, $model)
-    {
-
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
-
-            $rating_star = RatingStar::get($id);
-
-            if (have_posts($rating_star)) {
-
-                if (RatingStar::delete($id) != 0) {
-
-                    $result['message'] = 'Xóa dữ liệu thành công';
-
-                    $result['status'] = 'success';
-                }
-            }
-        }
-        echo json_encode($result);
-    }
-    static public function statusSave($ci, $model) {
-
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
-
-            $rating_star = RatingStar::get($id);
-
-            if (have_posts($rating_star)) {
-
-                $status = $rating_star->status;
-
-                if ($status == 'public') {
-
-                    $rating_star->status = 'hidden';
-
-                    $result['status'] = '<span class="label label-danger">Ẩn</span>';
-
-                    $result['status_label'] = 'Hiển thị';
-
-                    $rating_star_product = Metadata::get($rating_star->object_type, $rating_star->object_id, 'rating_star', true);
-
-                    if (!have_posts($rating_star_product)) {
-                        $rating_star_product = ['count' => 0, 'star' => 0];
-                    } else {
-                        $rating_star_product['count'] = $rating_star_product['count'] - 1;
-                        $rating_star_product['star'] = $rating_star_product['star'] - $rating_star->star;
-                    }
-                }
-
-                if ($status == 'hidden') {
-
-                    $rating_star->status = 'public';
-
-                    $result['status'] = '<span class="label label-success">Hiển thị</span>';
-
-                    $result['status_label'] = 'Ẩn';
-
-                    $rating_star_product = Metadata::get($rating_star->object_type, $rating_star->object_id, 'rating_star', true);
-
-                    if (!have_posts($rating_star_product)) {
-                        $rating_star_product = array('count' => 0, 'star' => 0);
-                    } else {
-
-                        $rating_star_product['count'] += 1;
-
-                        $rating_star_product['star'] += $rating_star->star;
-                    }
-                }
-
-                if (!is_skd_error(RatingStar::insert((array)$rating_star))) {
-
-                    Metadata::update($rating_star->object_type, $rating_star->object_id, 'rating_star', $rating_star_product);
-
-                    $result['message'] = 'Cập nhật dữ liệu thành công';
-
-                    $result['status'] = 'success';
-                }
-            }
-        }
-
-        echo json_encode($result);
-    }
-}
-Ajax::admin('Rating_Star_Admin_Ajax::commentLoad');
-Ajax::admin('Rating_Star_Admin_Ajax::commentSave');
-Ajax::admin('Rating_Star_Admin_Ajax::commentDelete');
-Ajax::admin('Rating_Star_Admin_Ajax::statusSave');

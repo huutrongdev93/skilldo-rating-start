@@ -39,7 +39,7 @@ Class Rating_Star_Post {
 
             ob_start();
 
-            Plugin::partial(RATING_STAR_NAME, 'template3', $data);
+            Plugin::partial(RATING_STAR_NAME, 'template1', $data);
 
             Plugin::partial(RATING_STAR_NAME, 'review', $data);
 
@@ -68,6 +68,9 @@ Class Rating_Star_Post {
 
     static function get($args = null) {
         return Posts::get($args);
+    }
+    static function getsData($listId) {
+        return Posts::gets(Qr::set()->whereIn('id', $listId)->select('id', 'title', 'slug'));
     }
 }
 

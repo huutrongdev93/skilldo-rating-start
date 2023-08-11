@@ -89,7 +89,8 @@ class RatingStar extends Model {
         return $id;
     }
 
-    static public function delete($id = '') {
+    static public function delete($id = ''): array|int
+    {
 
         $model = model('rating_star');
 
@@ -154,6 +155,7 @@ class RatingStar extends Model {
             'auto_percent_5'  => 90,
             'auto_percent_4'  => 50,
             'auto_percent_3'  => 0,
+            'autoDataType'    => 'auto',
         ];
 
         $option = Option::get('rating_star_setting', $setting);
@@ -173,6 +175,8 @@ class RatingStar extends Model {
 
         if(isset($option['color']))  $setting['color'] = array_merge($setting['color'], $option['color']);
 
+        if(empty($option['autoDataType'])) $option['autoDataType'] = 'auto';
+
         if(is_array($setting['color']['star'])) $setting['color']['star'] = '#ffbe00';
 
         if(!empty($key)) {
@@ -182,33 +186,55 @@ class RatingStar extends Model {
         return $setting;
     }
 
-    static public function random() {
+    static public function random(): array
+    {
 
         include_once RATING_STAR_PATH.'/includes/BiasRandom.php';
+
+        $config = RatingStar::config();
 
         $biasRandom = new BiasRandom();
 
         $dataNumberStar = [];
 
-        $percent = (int)RatingStar::config('auto_percent_5');
+        $percent = (int)$config['auto_percent_5'];
 
         if($percent != 0) $dataNumberStar[5] = $percent;
 
-        $percent = (int)RatingStar::config('auto_percent_4');
+        $percent = (int)$config['auto_percent_4'];
 
         if($percent != 0) $dataNumberStar[4] = $percent;
 
-        $percent = (int)RatingStar::config('auto_percent_3');
+        $percent = (int)$config['auto_percent_3'];
 
         if($percent != 0) $dataNumberStar[3] = $percent;
 
         $biasRandom->setData($dataNumberStar);
 
-        $service = 'https://cdn.sikido.vn';
+        if($config['autoDataType'] == 'auto') {
 
-        $dataTemp = file_get_contents($service.'/star-ratings');
+            $service = 'https://cdn.sikido.vn';
 
-        $dataTemp = (array)json_decode($dataTemp);
+            $dataTemp = file_get_contents($service.'/star-ratings');
+
+            $dataTemp = (array)json_decode($dataTemp);
+        }
+        else {
+            $dataTemp = [
+                'name' => [], 'message' => []
+            ];
+
+            $dataAuto = file_get_contents(RATING_STAR_PATH.'/assets/auto-data.json');
+
+            $dataAuto = json_decode($dataAuto);
+
+            if(have_posts($dataAuto)) {
+                foreach ($dataAuto as $item) {
+                    $dataTemp['name'][] = $item->name;
+                    $dataTemp['message'][] = $item->message;
+                }
+            }
+        }
 
         $number = rand(RatingStar::config('auto_min_number'), RatingStar::config('auto_max_number'));
 
@@ -218,7 +244,12 @@ class RatingStar extends Model {
 
         for($i = 0; $i <= $number; $i++) {
 
-            $dataRandom[$i] = ['name' => '', 'message' => '', 'star' => 5, 'object_type' => 'products', 'is_read' => 1];
+            $dataRandom[$i] = [
+                'message'       => '',
+                'star'          => 5,
+                'object_type'   => 'products',
+                'is_read'       => 1
+            ];
             //Name
             $keyRandom = array_rand($dataTemp['name'], 1);
             while (!empty($randomSuccess['name']) && in_array($keyRandom, $randomSuccess['name']) !== false) {

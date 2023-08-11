@@ -1,48 +1,44 @@
 <div class="review-item js_review_item" data-id="<?php echo $review->id;?>" data-name="<?php echo $review->name;?>" data-message="<?php echo $review->message;?>">
     <div class="review-comment">
-        <div class="review-comment__user">
-            <div class="review-comment__user-inner">
-                <div class="review-comment__user-avatar">
-                    <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($review->name);?></span></div>
-                </div>
-                <div>
-                    <div class="review-comment__user-name"><?php echo $review->name;?></div>
-                    <div class="review-comment__user-date"><?php echo $review->email;?></div>
-                </div>
+        <div class="rvc_user">
+            <div class="rvc_user-avatar">
+                <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($review->name);?></span></div>
             </div>
-            <div class="review-comment__user-info"><img src="https://salt.tikicdn.com/ts/upload/84/41/b2/8c371b639b0d5f511b44bc20e9051210.png"> Đã nhận:&nbsp; <span class="rc-like-total"><?php echo $review->like;?></span> &nbsp;Lượt thích</div>
-        </div>
-        <div style="flex-grow: 1;">
-            <div class="review-comment__rating-title">
-                <div class="review-comment__rating">
+            <div class="rvc_user-info">
+	            <div class="rvc_user-name">
+                    <span><?php echo $review->name;?></span>
+                    <?php if($type == 'products') {?>
+			            <div class="rvc_user-seller"><i class="fal fa-check"></i> Đã mua hàng từ shop</div>
+                    <?php } ?>
+	            </div>
+	            <div class="rvc_star">
                     <?php Rating_star_product::template(1,$review->star, RatingStar::config('color.star.detail'));?>
-                </div>
-                <a class="review-comment__title" href="javascript:void(0)"><?php echo RatingStar::starLabel($review->star);?></a>
+	            </div>
             </div>
-            <?php if($type == 'products') {?>
-            <div class="review-comment__seller-name-attributes">
-                <div class="review-comment__seller-name">Đã mua hàng <i class="fal fa-check"></i> từ shop</div>
-            </div>
-            <?php } ?>
-            <div class="review-comment__content"><?php echo $review->message;?></div>
-            <div class="review-comment__images">
-                <?php
-                $files = Metadata::get('rating_star', $review->id, 'attach', true);
-                if(have_posts($files)) {
-                    ?>
-                    <div class="attach-images">
-                        <?php foreach ($files as $path => $item) { ?>
-                            <div class="images"><a href="<?php echo Url::base($path);?>" data-fancybox="group"><?php Template::img(Url::base($path));?></a></div>
-                        <?php } ?>
-                    </div>
+        </div>
+        <div class="rvc_content">
+	        <div class="rvc_content_inner">
+		        <p class="rvc_title"><?php echo RatingStar::starLabel($review->star);?></p>
+		        <div class="rvc_message"><?php echo $review->message;?></div>
+		        <div class="rvc_images">
                     <?php
-                }
-                ?>
-            </div>
-            <div class="review-comment__created-date">
-                <span>Nhận xét vào <?php echo rating_star::timeElapsed($review->created);?> trước</span>
-            </div>
-            <span data-view-id="pdp_product_review_like_button" class="review-comment__thank" data-id="<?php echo $review->id;?>" data-total="<?php echo $review->like;?>">
+                    $files = Metadata::get('rating_star', $review->id, 'attach', true);
+                    if(have_posts($files)) {
+                        ?>
+				        <div class="attach-images">
+                            <?php foreach ($files as $path => $item) { ?>
+						        <div class="images"><a href="<?php echo Url::base($path);?>" data-fancybox="group"><?php Template::img(Url::base($path));?></a></div>
+                            <?php } ?>
+				        </div>
+                        <?php
+                    }
+                    ?>
+		        </div>
+		        <div class="rvc_time">
+			        <span><?php echo rating_star::timeElapsed($review->created);?> trước</span>
+		        </div>
+	        </div>
+	        <span class="rvc_like js_rvc_btn_like" data-id="<?php echo $review->id;?>" data-total="<?php echo $review->like;?>">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
                     <g fill="none" fill-rule="evenodd">
                         <path d="M0 0H20V20H0z"></path>
@@ -50,30 +46,33 @@
                     </g>
                 </svg>
                 <span>Like </span>
+		        <span class="rc-like-total js_like_total"><?php echo $review->like;?></span>
             </span>
             <?php if($reply == true) {?>
-            <span data-view-id="pdp_product_review_reply_button" class="review-comment__reply" data-reply-id="<?php echo $review->id;?>">Gửi trả lời</span>
+		        <span class="rvc_reply js_rvc_btn_reply" data-reply-id="<?php echo $review->id;?>">
+			        Gửi trả lời
+		        </span>
             <?php } ?>
             <?php if(have_posts($review->reply)) {?>
-            <div class="review-comment__sub-comments">
-                <?php foreach ($review->reply as $comment) {  ?>
-                <div class="review-sub-comment">
-                    <div class="review-sub-comment__avatar-thumb">
-                        <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($comment->name);?></span></div>
-                    </div>
-                    <div class="review-sub-comment__inner">
-                        <div class="review-sub-comment__avatar">
-                            <div class="review-sub-comment__avatar-name"><?php echo $comment->name;?></div>
-                            <span class="review-sub-comment__check-icon"></span>
-                            <div class="review-sub-comment__avatar-date"><?php echo rating_star::timeElapsed($comment->created);?></time></div>
-                        </div>
-                        <div class="review-sub-comment__content">
-                            <div><span><?php echo $comment->message;?></span></div>
-                        </div>
-                    </div>
-                </div>
-                <?php } ?>
-            </div>
+		        <div class="review-comment__sub-comments">
+                    <?php foreach ($review->reply as $comment) {  ?>
+				        <div class="review-sub-comment">
+					        <div class="review-sub-comment__avatar-thumb">
+						        <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($comment->name);?></span></div>
+					        </div>
+					        <div class="review-sub-comment__inner">
+						        <div class="review-sub-comment__avatar">
+							        <div class="review-sub-comment__avatar-name"><?php echo $comment->name;?></div>
+							        <span class="review-sub-comment__check-icon"></span>
+							        <div class="review-sub-comment__avatar-date"><?php echo rating_star::timeElapsed($comment->created);?></time></div>
+						        </div>
+						        <div class="review-sub-comment__content">
+							        <div><span><?php echo $comment->message;?></span></div>
+						        </div>
+					        </div>
+				        </div>
+                    <?php } ?>
+		        </div>
             <?php } ?>
         </div>
     </div>

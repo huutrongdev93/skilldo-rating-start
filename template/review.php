@@ -1,4 +1,4 @@
-<div class="review-comments js_review_comments">
+<div class="review-comments js_review_comments" data-id="<?php echo $object->id;?>" data-type="<?php echo $type;?>">
     <?php echo Admin::loading();?>
     <div class="review-comments_heading">
         <p class="review_heading__title">ĐÁNH GIÁ SẢN PHẨM</p>
@@ -13,8 +13,8 @@
             <?php } ?>
         </ul>
     </div>
-    <div class="review-comments_content"></div>
-    <div class="review-comments_pagination"></div>
+    <div class="review-comments_content" id="js_review_comments_list"></div>
+    <div class="review-comments_pagination" id="js_review_comments_pagination"></div>
     <div class="review-comments_more"><button class="btn btn-theme btn-effect-default js_review_btn__more">Xem tất cả đánh giá</button></div>
 </div>
 
@@ -43,8 +43,8 @@
                             <input name="rating_star_email" value="<?php echo $form['email'];?>" type="email" class="form-control" placeholder="<?php echo __('Email của bạn', 'rating_placeholder_email');?>" required <?php if(Auth::check()) echo 'readonly';?>>
                         </div>
                         <?php } ?>
-                        <div class="form-group col-md-12">
-                            <button type="submit" class="btn btn-theme btn-effect-default d-block"><?php echo __('Gửi');?></button>
+                        <div class="form-group col-md-12 mt-2">
+                            <button type="submit" class="btn btn-theme btn-effect-default d-block w-100"><?php echo __('Gửi');?></button>
                         </div>
                     </div>
                 </form>
@@ -56,135 +56,164 @@
 
 <script defer>
     $(function(){
-        let page = 1;
-        let sort = '';
-        let object_id = '<?php echo $object->id;?>';
-        let type = '<?php echo $type;?>';
-        let review_id = 0;
-        let liked = {};
-        let isMobile = '<?php echo Device::isMobile();?>';
-        function rating_star_review_load() {
-            $('.review-comments .loading').show();
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (settings.data.indexOf('csrf_test_name') === -1) {
-                        settings.data += '&csrf_test_name=' + encodeURIComponent(getCookie('csrf_cookie_name'));
-                    }
-                }
-            });
-            let data = {
-                'action': 'Rating_Star_Ajax::reviewLoad',
-                'page'  : page,
-                'object_id' : object_id,
-                'object_type' : type,
-                'sort' : sort
-            };
-            $.post(ajax, data, function () { }, 'json').done(function (response) {
-                $('.review-comments .loading').hide();
-                if (response.status === 'success') {
-                    if(isMobile == 1) {
-                        if(page === 1 && response.pagination === '') {
-                            $('.js_review_btn__more').hide();
-                        }
-                        else {
-                            $('.js_review_btn__more').show();
-                        }
-                    }
+		class RatingStartReviewHandle {
+			constructor() {
+				this.page       = 1;
+				this.sort       = null;
+				this.reviewDiv  = $('.js_review_comments')
+				this.objectId   = this.reviewDiv.data('id')
+				this.type       = this.reviewDiv.data('type')
+				this.loading    = this.reviewDiv.find('.loading')
+				this.reviewId   = 0
+				this.liked       = {}
+				this.isMobile   = '<?php echo Device::isMobile();?>';
+				this.load();
+			}
+			load() {
+				let self = this;
+				this.loading.show();
+				$.ajaxSetup({
+					beforeSend: function(xhr, settings) {
+						if (settings.data.indexOf('csrf_test_name') === -1) {
+							settings.data += '&csrf_test_name=' + encodeURIComponent(getCookie('csrf_cookie_name'));
+						}
+					}
+				});
+				let data = {
+					'action'        : 'Rating_Star_Ajax::reviewLoad',
+					'page'          : this.page,
+					'object_id'     : this.objectId,
+					'object_type'   : this.type,
+					'sort'          : this.sort
+				};
+				$.post(ajax, data, function () {}, 'json').done(function (response) {
 
-                    $('.review-comments_content').html(response.review);
-                    $('.review-comments_pagination').html(response.pagination);
-                }
-                else {
-                    show_message(response.message, response.status);
-                }
-            });
-        }
-        rating_star_review_load();
-        $(document).on('click', '.review-comments_pagination .pagination-item', function () {
-            page = $(this).attr('data-page-number');
-            rating_star_review_load();
-            $('html,body').animate({
-                scrollTop: $(".review-comments_sort").offset().top - 100
-            }, 'slow');
-            return false;
-        });
-        $(document).on('click', '.review-comments_sort ul li.star', function () {
-            page = 1;
-            sort = $(this).attr('data-sort');
-            $('.review-comments_sort ul li.star').removeClass('active');
-            $(this).addClass('active');
-            rating_star_review_load();
-            $('html,body').animate({
-                scrollTop: $(".review-comments_sort").offset().top - 100
-            }, 'slow');
-            return false;
-        });
-        $(document).on('click', '.review-comment__thank', function() {
+					self.loading.hide();
 
-            let item = $(this).closest('.js_review_item');
+					if (response.status === 'success') {
 
-            let total = parseInt($(this).attr('data-total')) + 1;
+						if(self.isMobile == 1) {
+							if(self.page === 1 && response.pagination === '') {
+								$('.js_review_btn__more').hide();
+							}
+							else {
+								$('.js_review_btn__more').show();
+							}
+						}
 
-            review_id = item.data('id');
+						$('#js_review_comments_list').html(response.review);
 
-            if(typeof liked[review_id] != 'undefined') {
-                return false;
-            }
-            else {
-                liked[review_id] = review_id;
-            }
+						$('#js_review_comments_pagination').html(response.pagination);
+					}
+					else {
+						show_message(response.message, response.status);
+					}
+				});
+			}
+			pagination(element) {
+				this.page = element.attr('data-page-number');
+				this.load();
+				$('html,body').animate({
+					scrollTop: $(".review-comments_sort").offset().top - 100
+				}, 'slow');
+				return false;
+			}
+			sort(element) {
+				this.page = 1
+				this.sort = element.attr('data-sort');
+				$('.review-comments_sort ul li.star').removeClass('active');
+				element.addClass('active');
+				this.load();
+				$('html,body').animate({
+					scrollTop: $(".review-comments_sort").offset().top - 100
+				}, 'slow');
+				return false;
+			}
+			like(element) {
 
-            item.find('.review-comment__user-info .rc-like-total').html(total);
+				let item = element.closest('.js_review_item');
 
-            $(this).attr('data-total', total);
+				let total = parseInt(element.attr('data-total')) + 1;
 
-            $(this).addClass('review-comment__thank--active');
+				this.reviewId = item.data('id');
 
-            let data = {
-                'action' : 'Rating_Star_Ajax::reviewLike',
-                'id' : review_id
-            };
+				if(typeof this.liked[this.reviewId] != 'undefined') {
+					return false;
+				}
+				else {
+					this.liked[this.reviewId] = this.reviewId;
+				}
 
-            $.post(ajax, data, function () {}, 'json').done(function (response) {});
+				item.find('.js_like_total').html(total);
 
-            return false;
-        });
-        $(document).on('click', '.review-comment__reply', function () {
-            let item = $(this).closest('.js_review_item');
-            review_id = item.data('id');
-            $('.js_review__reply_name').html(item.data('name'));
-            $('.js_review__reply_content').html(item.data('message'));
-            MicroModal.show('js_rating_star_modal__reply');
-        });
-        $(document).on('click', '.js_review_btn__more', function () {
-            $('.js_review_comments').addClass('active');
-        });
-        $(document).on('click', '.js_review_btn__close', function () {
-            $('.js_review_comments').removeClass('active');
-        });
-        $(document).on('submit', '#js_review_form__reply', function(){
-            let self = $(this);
+				element.attr('data-total', total);
 
-            let data = self.serializeJSON();
+				element.addClass('rvc_like--active');
 
-            let loading = self.find('.loading');
+				let data = {
+					'action' : 'Rating_Star_Ajax::reviewLike',
+					'id' : this.reviewId
+				};
 
-            data.action = 'Rating_Star_Ajax::reviewReply';
+				$.post(ajax, data, function () {}, 'json').done(function (response) {});
 
-            data.id = review_id;
+				return false;
+			}
+			clickReply(element) {
+				let item = element.closest('.js_review_item');
+				this.reviewId = item.data('id');
+				$('.js_review__reply_name').html(item.data('name'));
+				$('.js_review__reply_content').html(item.data('message'));
+				MicroModal.show('js_rating_star_modal__reply');
+			}
+			reply(element) {
 
-            loading.show();
+				let data = element.serializeJSON();
 
-            $.post(ajax, data, function () { }, 'json').done(function (response) {
-                loading.hide();
-                show_message(response.message, response.status);
-                if (response.status === 'success') {
-                    MicroModal.close('js_rating_star_modal__reply');
-                    self.trigger('reset');
-                }
-            });
+				let loading = element.find('.loading');
 
-            return false;
-        });
+				data.action = 'Rating_Star_Ajax::reviewReply';
+
+				data.id = this.reviewId;
+
+				loading.show();
+
+				$.post(ajax, data, function () {}, 'json').done(function (response) {
+					loading.hide();
+					show_message(response.message, response.status);
+					if (response.status === 'success') {
+						MicroModal.close('js_rating_star_modal__reply');
+						element.trigger('reset');
+					}
+				});
+
+				return false;
+			}
+		}
+
+		const ratingStartReview = new RatingStartReviewHandle();
+
+	    $(document)
+		    .on('click', '#js_review_comments_pagination .pagination-item', function () {
+			    return ratingStartReview.pagination($(this))
+		    })
+		    .on('click', '.review-comments_sort ul li.star', function () {
+			    return ratingStartReview.sort($(this))
+		    })
+		    .on('click', '.js_rvc_btn_like', function () {
+			    return ratingStartReview.like($(this))
+		    })
+		    .on('click', '.js_rvc_btn_reply', function () {
+			    return ratingStartReview.clickReply($(this))
+            })
+		    .on('click', '.js_review_btn__more', function () {
+			    ratingStartReview.reviewDiv.addClass('active');
+		    })
+		    .on('click', '.js_review_btn__close', function () {
+			    ratingStartReview.reviewDiv.removeClass('active');
+		    })
+		    .on('submit', '#js_review_form__reply', function () {
+			    return ratingStartReview.reply($(this))
+		    })
     });
 </script>

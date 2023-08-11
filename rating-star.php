@@ -5,11 +5,11 @@ Plugin class    : rating_star
 Plugin uri      : http://sikido.vn
 Description     : Với ứng dụng Rating Star, bạn có thể thu được nhiều đánh giá hơn bất kì một cách thức nào khác. Chúng đã được duyệt kỹ lưỡng trước khi được hiển thị trên website của bạn
 Author          : Nguyễn Hữu Trọng
-Version         : 4.4.2
+Version         : 4.5.0
  */
 const RATING_STAR_NAME = 'rating-star';
 
-const RATING_STAR_VERSION = '4.4.2';
+const RATING_STAR_VERSION = '4.5.0';
 
 define('RATING_STAR_PATH',  Path::plugin(RATING_STAR_NAME));
 
@@ -19,15 +19,18 @@ class rating_star {
 
     function __construct() {}
 
-    public function active() {
+    public function active(): void
+    {
         Rating_Star_Database::create();
     }
 
-    public function uninstall() {
+    public function uninstall(): void
+    {
         Rating_Star_Database::drop();
     }
     
-    static function timeElapsed($datetime, $full = false) {
+    static function timeElapsed($datetime, $full = false): string
+    {
 
         $now = new DateTime;
 
@@ -62,7 +65,8 @@ class rating_star {
         return $string ? implode(', ', $string) : '';
     }
 
-    static function getKeyName($name) {
+    static function getKeyName($name): string
+    {
         $name = explode(' ', $name);
         $first = mb_substr($name[0], 0, 1);
         $last = (count($name) > 1) ? mb_substr(Arr::last($name), 0, 1) : '';

@@ -131,13 +131,13 @@
   font-size: 14px;
   cursor: pointer;
 }
-.table-responsive table.table {
+.table-responsive table.table-rating {
   min-width: 1000px;
 }
-.table-responsive table.table .rating-star-item.is_read td {
+.table-responsive table.table-rating .rating-star-item.is_read td {
   background-color: #f6f6f6;
 }
-.table-responsive table.table .rating-star-item .badge {
+.table-responsive table.table-rating .rating-star-item .badge {
   display: inline-block;
   padding: 2px 8px;
   font-size: 14px;
@@ -151,22 +151,22 @@
   border-width: 1px;
   height: 24px;
 }
-.table-responsive table.table .rating-star-item .badge-red {
+.table-responsive table.table-rating .rating-star-item .badge-red {
   background-color: #fef1f1;
   color: #dc2828;
   border-color: #dc2828;
 }
-.table-responsive table.table .rating-star-item .badge-green {
+.table-responsive table.table-rating .rating-star-item .badge-green {
   background-color: #f2fdf5;
   color: #16a249;
   border-color: #16a249;
 }
-.table-responsive table.table .rating-star-item .badge-yellow {
+.table-responsive table.table-rating .rating-star-item .badge-yellow {
   background-color: #fefce7;
   color: #c88a04;
   border-color: #c88a04;
 }
-.table-responsive table.table .js_column_action .btn {
+.table-responsive table.table-rating .js_column_action .btn {
   font-size: 12px;
   margin-left: 0;
 }

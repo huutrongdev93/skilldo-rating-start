@@ -1,6 +1,7 @@
 <?php
 include 'ajax.php';
 include 'products.php';
+include 'roles.php';
 
 Class AdminRatingStar {
     static public function navigation(): void

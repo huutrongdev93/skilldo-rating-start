@@ -33,6 +33,10 @@ Class Rating_Star_Post {
                 'config' => RatingStar::config(),
                 'star'   => (isset($rating_star_data['star'])) ? $rating_star_data['star'] : 0,
                 'count'  => (isset($rating_star_data['count'])) ? $rating_star_data['count'] : 0,
+                'form'   => [
+                    'name' => '',
+                    'email' => '',
+                ]
             ];
 
             if($data['count'] != 0) $data['star'] = round($data['star']/$data['count']);

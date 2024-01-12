@@ -118,7 +118,7 @@
 				}, 'slow');
 				return false;
 			}
-			sort(element) {
+			sortComment(element) {
 				this.page = 1
 				this.sort = element.attr('data-sort');
 				$('.review-comments_sort ul li.star').removeClass('active');
@@ -198,7 +198,7 @@
 			    return ratingStartReview.pagination($(this))
 		    })
 		    .on('click', '.review-comments_sort ul li.star', function () {
-			    return ratingStartReview.sort($(this))
+			    return ratingStartReview.sortComment($(this))
 		    })
 		    .on('click', '.js_rvc_btn_like', function () {
 			    return ratingStartReview.like($(this))

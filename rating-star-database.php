@@ -1,10 +1,10 @@
 <?php
 Class Rating_Star_Database {
 
-    static public function create() {
-        $model = model();
-        if(!$model::schema()->hasTable('rating_star')) {
-            $model::schema()->create('rating_star', function ($table) {
+    static public function create(): void
+    {
+        if(!schema()->hasTable('rating_star')) {
+            schema()->create('rating_star', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->increments('id');
                 $table->string('name', 200)->collate('utf8mb4_unicode_ci')->nullable();
                 $table->string('email', 200)->collate('utf8mb4_unicode_ci')->nullable();
@@ -24,14 +24,14 @@ Class Rating_Star_Database {
                 $table->dateTime('updated')->nullable();
             });
         }
-        $role = Role::get('root');
-        $role->add_cap('rating_star');
-        $role = Role::get('administrator');
-        $role->add_cap('rating_star');
+
+        Role::get('root')->add('rating_star');
+
+        Role::get('administrator')->add('rating_star');
     }
 
-    static public function drop() {
-        $model = model();
-        $model::schema()->drop('rating_star');
+    static public function drop(): void
+    {
+        schema()->drop('rating_star');
     }
 }

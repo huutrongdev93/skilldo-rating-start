@@ -1,22 +1,19 @@
 <?php
 Class Rating_Star_Admin_Ajax {
-    static function load($ci, $model): void
+
+    static function load(\SkillDo\Http\Request $request, $model): void
     {
-        $result['status'] 	= 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] 	= 'Load dữ liệu không thành công';
+            $page   = $request->input('page');
 
-        if(Request::post()) {
+            $limit  = $request->input('limit');
 
-            $page   = Request::post('page');
+            $status = $request->input('status');
 
-            $limit  = Request::post('limit');
+            $star   = (int)$request->input('star');
 
-            $status = Request::post('status');
-
-            $star   = (int)Request::post('star');
-
-            $type   = Request::post('type');
+            $type   = $request->input('type');
 
             $args = Qr::set();
 
@@ -52,7 +49,7 @@ Class Rating_Star_Admin_Ajax {
 
             $objects = RatingStar::gets($args);
 
-            $result['data'] = [
+            $result = [
                 'items' => '',
                 'pagination' => base64_encode($pagination->frontend())
             ];
@@ -91,27 +88,22 @@ Class Rating_Star_Admin_Ajax {
 
                     $object->reply = RatingStar::count(Qr::set('parent_id', $object->id)->where('object_type', 'comment'));
 
-                    $result['data']['items'] .= Plugin::partial(RATING_STAR_NAME, 'admin/item', ['item' => $object], true);
+                    $result['items'] .= Plugin::partial(RATING_STAR_NAME, 'admin/item', ['item' => $object]);
                 }
             }
 
-            $result['data']['items']    = base64_encode($result['data']['items']);
-            $result['status'] 	        = 'success';
-            $result['message'] 	        = 'Load dữ liệu thành công';
+            $result['items']    = base64_encode($result['items']);
+
+            response()->success(trans('ajax.load.success'), $result);
         }
 
-        echo json_encode($result);
+        response()->error(trans('ajax.load.error'));
     }
-    static function commentLoad($ci, $model): void
+    static function commentLoad(\SkillDo\Http\Request $request, $model): void
     {
+        if($request->isMethod('post')) {
 
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
+            $id = (int)$request->input('id');
 
             $rating_star = RatingStar::get($id);
 
@@ -123,62 +115,45 @@ Class Rating_Star_Admin_Ajax {
                     $comment->avatar = rating_star::getKeyName($comment->name);
                 }
 
-                $result['data'] = [
+                response()->success(trans('ajax.load.success'), [
                     'items' => $comments
-                ];
-
-                $result['status'] = 'success';
-
-                $result['message'] = 'Load dữ liệu thành công.';
+                ]);
             }
         }
 
-        echo json_encode($result);
+        response()->error(trans('ajax.load.error'));
     }
-    static function commentAdd($ci, $model): bool
+    static function commentAdd(\SkillDo\Http\Request $request, $model): bool
     {
+        if($request->isMethod('post')) {
 
-        $result['status'] = 'error';
+            $data = $request->input('comment');
 
-        $result['message'] = 'Lưu dữ liệu không thành công';
-
-        if (Request::post()) {
-
-            $data = Request::post('comment');
-
-            $id   = (int)Request::post('parentId');
+            $id   = (int)$request->input('parentId');
 
             $ratingStar = RatingStar::get($id);
 
             if (have_posts($ratingStar)) {
 
                 if(empty($data['name'])) {
-                    $result['message'] = 'Tên người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Tên người trả lời không được để trống'));
                 }
-
-                $rating['name']         = Str::clear($data['name']);
 
                 if(empty($data['email'])) {
-                    $result['message'] = 'Email người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Email người trả lời không được để trống'));
                 }
 
-                $rating['email']        = Str::clear($data['email']);
-
                 if (empty($data['content'])) {
-                    $result['message'] = 'Không được để trống câu trả lời của bạn.';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Không được để trống câu trả lời của bạn'));
                 }
 
                 if (strlen($data['content']) < 10) {
-                    $result['message'] = 'Nội dung trả lời quá ngắn.';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Nội dung trả lời quá ngắn'));
                 }
+
+                $rating['name'] = Str::clear($data['name']);
+
+                $rating['email'] = Str::clear($data['email']);
 
                 $rating['message']      = Str::clear($data['content']);
 
@@ -196,70 +171,51 @@ Class Rating_Star_Admin_Ajax {
 
                 if (!is_skd_error($id)) {
 
-                    $result['data'] = [
+                    response()->success(trans('Đăng câu trả lời thành công'), [
                         'item' => [
                             'id'     => $id,
                             'avatar' => rating_star::getKeyName($rating['name']),
                             'created'=> date('Y-m-d H:i:s'),
                             ...$rating,
                         ]
-                    ];
-
-                    $result['status'] = 'success';
-
-                    $result['message'] = 'Đăng câu trả lời thành công.';
+                    ]);
                 }
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.add.error'));
     }
-    static function commentEdit($ci, $model): bool
+    static function commentEdit(\SkillDo\Http\Request $request, $model): bool
     {
+        if($request->isMethod('post')) {
 
-        $result['status'] = 'error';
+            $data       = $request->input('comment');
 
-        $result['message'] = 'Lưu dữ liệu không thành công';
-
-        if (Request::post()) {
-
-            $data       = Request::post('comment');
-
-            $id         = (int)Request::post('id');
+            $id         = (int)$request->input('id');
 
             $ratingStar = RatingStar::get(Qr::set($id)->where('object_type', 'comment'));
 
             if (have_posts($ratingStar)) {
 
                 if(empty($data['name'])) {
-                    $result['message'] = 'Tên người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Tên người trả lời không được để trống'));
+                }
+
+                if(empty($data['email'])) {
+                    response()->error(trans('Email người trả lời không được để trống'));
+                }
+
+                if (empty($data['content'])) {
+                    response()->error(trans('Không được để trống câu trả lời của bạn'));
+                }
+
+                if (strlen($data['content']) < 10) {
+                    response()->error(trans('Nội dung trả lời quá ngắn'));
                 }
 
                 $ratingStar->name         = Str::clear($data['name']);
 
-                if(empty($data['email'])) {
-                    $result['message'] = 'Email người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
-                }
-
                 $ratingStar->email        = Str::clear($data['email']);
-
-                if (empty($data['content'])) {
-                    $result['message'] = 'Không được để trống câu trả lời của bạn.';
-                    echo json_encode($result);
-                    return false;
-                }
-
-                if (strlen($data['content']) < 10) {
-                    $result['message'] = 'Nội dung trả lời quá ngắn.';
-                    echo json_encode($result);
-                    return false;
-                }
 
                 $ratingStar->message      = Str::clear($data['content']);
 
@@ -271,31 +227,20 @@ Class Rating_Star_Admin_Ajax {
 
                     $ratingStar->isActive = 'active';
 
-                    $result['data'] = [
+                    response()->success(trans('Cập nhật câu trả lời thành công'), [
                         'item' => $ratingStar
-                    ];
-
-                    $result['status'] = 'success';
-
-                    $result['message'] = 'Cập nhật câu trả lời thành công.';
+                    ]);
                 }
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.save.error'));
     }
-    static function commentDelete($ci, $model): void
+    static function commentDelete(\SkillDo\Http\Request $request, $model): void
     {
+        if($request->isMethod('post')) {
 
-        $result['status'] = 'error';
-
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
+            $id = (int)$request->input('id');
 
             $rating_star = RatingStar::get($id);
 
@@ -303,40 +248,31 @@ Class Rating_Star_Admin_Ajax {
 
                 if (RatingStar::delete($id) != 0) {
 
-                    $result['message'] = 'Xóa dữ liệu thành công';
-
-                    $result['status'] = 'success';
+                    response()->success(trans('ajax.delete.success'));
                 }
             }
         }
-        echo json_encode($result);
+
+        response()->error(trans('ajax.delete.error'));
     }
-    static function status($ci, $model): bool
+    static function status(\SkillDo\Http\Request $request, $model): bool
     {
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-
-        if (Request::post()) {
-
-            $id = (int)Request::post('id');
+            $id = (int)$request->input('id');
 
             $ratingStar = RatingStar::get($id);
 
             if (have_posts($ratingStar)) {
 
-                $status = Request::post('status');
+                $status = $request->input('status');
 
                 if(empty($status)) {
-                    $result['message'] = 'Trạng thái cần cập nhật không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Trạng thái cần cập nhật không được để trống'));
                 }
 
                 if($ratingStar->status == $status) {
-                    $result['message'] = 'Trạng thái đánh giá không thay đổi';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Trạng thái đánh giá không thay đổi'));
                 }
 
                 $result['data'] = [
@@ -381,9 +317,7 @@ Class Rating_Star_Admin_Ajax {
                 }
 
                 if(empty($result['data']['status'])) {
-                    $result['message'] = 'Trạng thái đánh giá không đúng định dạng';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Trạng thái đánh giá không đúng định dạng'));
                 }
 
                 $ratingStar->status = $status;
@@ -399,28 +333,20 @@ Class Rating_Star_Admin_Ajax {
                         );
                     }
 
-                    $result['message'] = 'Cập nhật dữ liệu thành công';
-
-                    $result['status'] = 'success';
+                    response()->success(trans('ajax.save.success'));
                 }
             }
         }
 
-        echo json_encode($result);
-
-        return false;
+        response()->error(trans('ajax.save.error'));
     }
-    static function save($ci, $model): bool
+    static function save(\SkillDo\Http\Request $request, $model): bool
     {
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Lưu dữ liệu không thành công';
+            $data       = $request->input('review');
 
-        if (Request::post()) {
-
-            $data       = Request::post('review');
-
-            $id         = (int)Request::post('id');
+            $id         = (int)$request->input('id');
 
             $ratingStar = RatingStar::get($id);
 
@@ -429,16 +355,12 @@ Class Rating_Star_Admin_Ajax {
                 $ratingStarUpdate = ['id' => $ratingStar->id];
 
                 if(empty($data['name'])) {
-                    $result['message'] = 'Tên người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Tên người trả lời không được để trống'));
                 }
                 $ratingStarUpdate['name']         = Str::clear($data['name']);
 
                 if(empty($data['email'])) {
-                    $result['message'] = 'Email người trả lời không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Email người trả lời không được để trống'));
                 }
                 $ratingStarUpdate['email']        = Str::clear($data['email']);
 
@@ -447,30 +369,22 @@ Class Rating_Star_Admin_Ajax {
                 }
 
                 if (empty($data['content'])) {
-                    $result['message'] = 'Không được để trống câu trả lời của bạn.';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Không được để trống câu trả lời của bạn'));
                 }
 
                 if (strlen($data['content']) < 10) {
-                    $result['message'] = 'Nội dung trả lời quá ngắn.';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Nội dung trả lời quá ngắn'));
                 }
 
                 $ratingStarUpdate['message']      = Str::clear($data['content']);
 
                 if (empty($data['star']) || $data['star'] < 1 || $data['star'] > 5) {
-                    $result['message'] = 'Điểm đánh giá không được nhỏ hơn 1 hoặc lớn hơn 5';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Điểm đánh giá không được nhỏ hơn 1 hoặc lớn hơn 5'));
                 }
                 $ratingStarUpdate['star']  = Str::clear($data['star']);
 
                 if(empty($data['status'])) {
-                    $result['message'] = 'Trạng thái cần cập nhật không được để trống';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('Trạng thái cần cập nhật không được để trống'));
                 }
                 $ratingStarUpdate['status']  = Str::clear($data['status']);
 
@@ -521,74 +435,52 @@ Class Rating_Star_Admin_Ajax {
                     }
                     $ratingStar->reply = RatingStar::count(Qr::set('parent_id', $ratingStar->id)->where('object_type', 'comment'));
 
-                    $result['data'] = [
-                        'item' => Plugin::partial(RATING_STAR_NAME, 'admin/item', ['item' => $ratingStar], true)
-                    ];
-
-                    $result['status'] = 'success';
-
-                    $result['message'] = 'Cập nhật câu trả lời thành công.';
+                    response()->success(trans('ajax.save.success'), [
+                        'item' => Plugin::partial(RATING_STAR_NAME, 'admin/item', ['item' => $ratingStar])
+                    ]);
                 }
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.save.error'));
     }
-    static function delete($ci, $model): bool
+    static function delete(\SkillDo\Http\Request $request, $model): bool
     {
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Xóa dữ liệu không thành công';
-
-        if (Request::post()) {
-
-            $id         = (int)Request::post('id');
+            $id         = (int)$request->input('id');
 
             $ratingStar = RatingStar::get($id);
 
             if (have_posts($ratingStar)) {
+
                 RatingStar::delete($id);
-                $result['status'] = 'success';
-                $result['message'] = 'xóa dữ liệu thành công';
+
+                response()->success(trans('ajax.delete.success'));
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.delete.error'));
     }
-    static function randomReview($ci, $model): bool
+    static function randomReview(\SkillDo\Http\Request $request, $model): bool
     {
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Xóa dữ liệu không thành công';
-
-        if (Request::post()) {
-
-            $data = Request::post('data');
+            $data = $request->input('data');
 
             if(!have_posts($data)) {
-                $result['message'] = 'Không có sản phẩm nào được chọn';
-                echo json_encode($result);
-                return true;
+                response()->error(trans('Không có sản phẩm nào được chọn'));
             }
 
             foreach ($data as $productId) {
                 Rating_Star_Admin_Product::randomRatingStar($productId, 'products');
             }
 
-            $result['status'] = 'success';
-
-            $result['message'] = 'Thêm đánh giá cho sản phẩm thành công';
+            response()->success(trans('Thêm đánh giá cho sản phẩm thành công'));
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.delete.error'));
     }
-
 }
 Ajax::admin('Rating_Star_Admin_Ajax::load');
 Ajax::admin('Rating_Star_Admin_Ajax::commentLoad');

@@ -1,28 +1,28 @@
-<div class="review-comments js_review_comments" data-id="<?php echo $object->id;?>" data-type="<?php echo $type;?>">
-    <?php echo Admin::loading();?>
+<div class="review-comments js_review_comments" data-id="{{ $object->id }}" data-type="{{ $type }}">
+    {!! Admin::loading() !!}
     <div class="review-comments_heading">
-        <p class="review_heading__title">ĐÁNH GIÁ SẢN PHẨM</p>
+        <p class="review_heading__title">{{ trans('review.rating.title') }}</p>
         <p class="review_heading__close js_review_btn__close"><i class="fal fa-times"></i></p>
     </div>
     <div class="review-comments_sort">
         <ul>
-            <li><span><?php echo __('Lọc theo', 'rating_sort_label');?>:</span></li>
-            <li class="star active" data-sort=""><span><?php echo __('Tất cả', 'rating_sort_all');?></span></li>
-            <?php for($i =1; $i <= 5; $i++) {?>
-            <li class="star" data-sort="<?php echo $i;?>-star"><span><?php echo $i;?></span><i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i></li>
-            <?php } ?>
+            <li><span>{{ trans('review.rating.sort') }}:</span></li>
+            <li class="star active" data-sort=""><span>{{ trans('review.rating.sort.all') }}</span></li>
+            @for($i =1; $i <= 5; $i++)
+            <li class="star" data-sort="{{ $i }}-star"><span>{{ $i }}</span><i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i></li>
+            @endfor
         </ul>
     </div>
     <div class="review-comments_content" id="js_review_comments_list"></div>
     <div class="review-comments_pagination" id="js_review_comments_pagination"></div>
-    <div class="review-comments_more"><button class="btn btn-theme btn-effect-default js_review_btn__more">Xem tất cả đánh giá</button></div>
+    <div class="review-comments_more"><button class="btn btn-theme btn-effect-default js_review_btn__more">{{ trans('review.rating.view.all') }}</button></div>
 </div>
 
 <div class="modal micromodal-slide rating_star_modal__reply review-form" id="js_rating_star_modal__reply" aria-hidden="true">
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
             <header class="modal__header">
-                <h2 class="modal__title">Phản hồi đánh giá</h2>
+                <h2 class="modal__title">{{ trans('review.rating.reply.title') }}</h2>
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <div class="modal__content js_rating_star_modal__reply">
@@ -33,23 +33,23 @@
                 <form method="post" id="js_review_form__reply" autocomplete="off">
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="<?php echo __('Hãy chia sẻ những điều bạn thích về sản phẩm này nhé', 'rating_placeholder_message');?>"></textarea>
+                            <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="{{ trans('template.rating.message.placeholder') }}"></textarea>
                         </div>
-                        <?php if(!Auth::check()) {?>
+                        @if(!Auth::check())
                         <div class="form-group col-md-6">
-                            <input name="rating_star_name" value="<?php echo $form['name'];?>" type="text" class="form-control" placeholder="<?php echo __('Họ tên của bạn', 'rating_placeholder_name');?>" required <?php if(Auth::check()) echo 'readonly';?>>
+                            <input name="rating_star_name" value="{{ $form['name'] }}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
                         </div>
                         <div class="form-group col-md-6">
-                            <input name="rating_star_email" value="<?php echo $form['email'];?>" type="email" class="form-control" placeholder="<?php echo __('Email của bạn', 'rating_placeholder_email');?>" required <?php if(Auth::check()) echo 'readonly';?>>
+                            <input name="rating_star_email" value="{{ $form['email'] }}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
                         </div>
-                        <?php } ?>
+                        @endif
                         <div class="form-group col-md-12 mt-2">
-                            <button type="submit" class="btn btn-theme btn-effect-default d-block w-100"><?php echo __('Gửi');?></button>
+                            <button type="submit" class="btn btn-theme btn-effect-default d-block w-100">{{ trans('general.send')  }}</button>
                         </div>
                     </div>
                 </form>
             </div>
-            <?php echo Admin::loading();?>
+            {!! Admin::loading() !!}
         </div>
     </div>
 </div>
@@ -66,7 +66,7 @@
 				this.loading    = this.reviewDiv.find('.loading')
 				this.reviewId   = 0
 				this.liked       = {}
-				this.isMobile   = '<?php echo Device::isMobile();?>';
+				this.isMobile   = '{{ Device::isMobile() }}';
 				this.load();
 			}
 			load() {
@@ -86,7 +86,9 @@
 					'object_type'   : this.type,
 					'sort'          : this.sort
 				};
-				$.post(ajax, data, function () {}, 'json').done(function (response) {
+
+
+				request.post(ajax, data).then(function(response) {
 
 					self.loading.hide();
 
@@ -101,12 +103,12 @@
 							}
 						}
 
-						$('#js_review_comments_list').html(response.review);
+						$('#js_review_comments_list').html(response.data.review);
 
-						$('#js_review_comments_pagination').html(response.pagination);
+						$('#js_review_comments_pagination').html(response.data.pagination);
 					}
 					else {
-						show_message(response.message, response.status);
+						SkilldoMessage.response(response);
 					}
 				});
 			}
@@ -155,7 +157,7 @@
 					'id' : this.reviewId
 				};
 
-				$.post(ajax, data, function () {}, 'json').done(function (response) {});
+				request.post(ajax, data).then(function(response) {});
 
 				return false;
 			}
@@ -178,9 +180,9 @@
 
 				loading.show();
 
-				$.post(ajax, data, function () {}, 'json').done(function (response) {
+				request.post(ajax, data).then(function(response) {
 					loading.hide();
-					show_message(response.message, response.status);
+					SkilldoMessage.response(response);
 					if (response.status === 'success') {
 						MicroModal.close('js_rating_star_modal__reply');
 						element.trigger('reset');

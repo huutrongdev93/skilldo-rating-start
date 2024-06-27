@@ -6,7 +6,7 @@ $(function () {
 		$('.select:checked').each(function () { changeProductList[i++] = $(this).val(); });
 
 		if(typeof changeProductList == 'undefined' || changeProductList.length === 0) {
-			show_message('Bạn chưa chọn sản phẩm nào', 'error');
+			SkilldoMessage.error('Bạn chưa chọn sản phẩm nào');
 			return false;
 		}
 
@@ -21,9 +21,9 @@ $(function () {
 			'data'  : changeProductList,
 		};
 
-		$.post(ajax, data, function () {}, 'json').done(function (data) {
-			show_message(data.message, data.status);
-			if (data.status === 'success') {
+		request.post(ajax, data).then(function (response) {
+			SkilldoMessage.response(response);
+			if (response.status === 'success') {
 				location.reload();
 			}
 		});

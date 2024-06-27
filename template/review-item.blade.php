@@ -1,44 +1,43 @@
-<div class="review-item js_review_item" data-id="<?php echo $review->id;?>" data-name="<?php echo $review->name;?>" data-message="<?php echo $review->message;?>">
+<div class="review-item js_review_item" data-id="{{ $review->id }}" data-name="{{ $review->name }}" data-message="{{ $review->message }}">
     <div class="review-comment">
         <div class="rvc_user">
             <div class="rvc_user-avatar">
-                <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($review->name);?></span></div>
+                <div class="avatar" data-name="{{ $review->name }}"><span>{{ rating_star::getKeyName($review->name) }}</span></div>
             </div>
             <div class="rvc_user-info">
 	            <div class="rvc_user-name">
-                    <span><?php echo $review->name;?></span>
-                    <?php if($type == 'products') {?>
-			            <div class="rvc_user-seller"><i class="fal fa-check"></i> Đã mua hàng từ shop</div>
-                    <?php } ?>
+                    <span>{{ $review->name }}</span>
+                    @if($type == 'products')
+			            <div class="rvc_user-seller"><i class="fal fa-check"></i> {{ trans('review.rating.seller') }}</div>
+                    @endif
 	            </div>
 	            <div class="rvc_star">
-                    <?php Rating_star_product::template(1,$review->star, RatingStar::config('color.star.detail'));?>
+                    @php Rating_star_product::template(1,$review->star, RatingStar::config('color.star.detail')) @endphp
 	            </div>
             </div>
         </div>
         <div class="rvc_content">
 	        <div class="rvc_content_inner">
-		        <p class="rvc_title"><?php echo RatingStar::starLabel($review->star);?></p>
-		        <div class="rvc_message"><?php echo $review->message;?></div>
+		        <p class="rvc_title">{{ RatingStar::starLabel($review->star) }}</p>
+		        <div class="rvc_message">{{ $review->message }}</div>
 		        <div class="rvc_images">
-                    <?php
+                    @php
                     $files = Metadata::get('rating_star', $review->id, 'attach', true);
-                    if(have_posts($files)) {
-                        ?>
+                    @endphp
+
+                    @if(have_posts($files)) 
 				        <div class="attach-images">
-                            <?php foreach ($files as $path => $item) { ?>
-						        <div class="images"><a href="<?php echo Url::base($path);?>" data-fancybox="group"><?php Template::img(Url::base($path));?></a></div>
-                            <?php } ?>
+                            @foreach ($files as $path => $item)
+						        <div class="images"><a href="{{ Url::base($path) }}" data-fancybox="group">{!! Template::img(Url::base($path)) !!}</a></div>
+						     @endforeach
 				        </div>
-                        <?php
-                    }
-                    ?>
+                    @endif
 		        </div>
 		        <div class="rvc_time">
-			        <span><?php echo rating_star::timeElapsed($review->created);?> trước</span>
+			        <span>{{ rating_star::timeElapsed($review->created) }} trước</span>
 		        </div>
 	        </div>
-	        <span class="rvc_like js_rvc_btn_like" data-id="<?php echo $review->id;?>" data-total="<?php echo $review->like;?>">
+	        <span class="rvc_like js_rvc_btn_like" data-id="{{ $review->id }}" data-total="{{ $review->like }}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
                     <g fill="none" fill-rule="evenodd">
                         <path d="M0 0H20V20H0z"></path>
@@ -46,34 +45,34 @@
                     </g>
                 </svg>
                 <span>Like </span>
-		        <span class="rc-like-total js_like_total"><?php echo $review->like;?></span>
+		        <span class="rc-like-total js_like_total">{{ $review->like }}</span>
             </span>
-            <?php if($reply == true) {?>
-		        <span class="rvc_reply js_rvc_btn_reply" data-reply-id="<?php echo $review->id;?>">
-			        Gửi trả lời
+            @if($reply == true)
+		        <span class="rvc_reply js_rvc_btn_reply" data-reply-id="{{ $review->id }}">
+			        {{ trans('review.rating.reply.send') }}
 		        </span>
-            <?php } ?>
-            <?php if(have_posts($review->reply)) {?>
+            @endif
+            @if(have_posts($review->reply))
 		        <div class="review-comment__sub-comments">
-                    <?php foreach ($review->reply as $comment) {  ?>
+                    @foreach ($review->reply as $comment)
 				        <div class="review-sub-comment">
 					        <div class="review-sub-comment__avatar-thumb">
-						        <div class="avatar" data-name="<?php echo $review->name;?>"><span><?php echo rating_star::getKeyName($comment->name);?></span></div>
+						        <div class="avatar" data-name="{{ $review->name }}"><span>{{ rating_star::getKeyName($comment->name) }}</span></div>
 					        </div>
 					        <div class="review-sub-comment__inner">
 						        <div class="review-sub-comment__avatar">
-							        <div class="review-sub-comment__avatar-name"><?php echo $comment->name;?></div>
+							        <div class="review-sub-comment__avatar-name">{{ $comment->name }}</div>
 							        <span class="review-sub-comment__check-icon"></span>
-							        <div class="review-sub-comment__avatar-date"><?php echo rating_star::timeElapsed($comment->created);?></time></div>
+							        <div class="review-sub-comment__avatar-date">{{ rating_star::timeElapsed($comment->created) }}</time></div>
 						        </div>
 						        <div class="review-sub-comment__content">
-							        <div><span><?php echo $comment->message;?></span></div>
+							        <div><span>{{ $comment->message }}</span></div>
 						        </div>
 					        </div>
 				        </div>
-                    <?php } ?>
+                    @endforeach
 		        </div>
-            <?php } ?>
+            @endif
         </div>
     </div>
 </div>

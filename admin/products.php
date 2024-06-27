@@ -22,7 +22,7 @@ Class Rating_Star_Admin_Product {
 
                         $model = model('rating_star');
 
-                        $model->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))], Qr::set($error));
+                        $model::where('id',$error)->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))]);
 
                         $rating_star_product = Product::getMeta($id, 'rating_star', true);
 

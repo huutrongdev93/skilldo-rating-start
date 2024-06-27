@@ -1,4 +1,4 @@
-<div style="display: none;" class="review-post-star-ratings review-valign-bottom review-align-right" data-id="<?php echo $object->id;?>">
+<div style="display: none;" class="review-post-star-ratings review-valign-bottom review-align-right" data-id="{{ $object->id }}">
     <div class="review-stars">
         <div class="review-stars-inactive">
             <div class="review-star" data-star="1">
@@ -19,22 +19,22 @@
         </div>
         <div class="review-stars-active" style="width: 135px;">
             <div class="review-star" style="text-align:var(--star-align)!important;color:var(--star-color);font-size:13px;">
-                <?php for( $i = 0; $i < 5; $i++ ) {?>
+                @for( $i = 0; $i < 5; $i++ )
                     <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
                             <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                         </svg>
                     </span>
-                <?php } ?>
+                @endfor
             </div>
             <div class="review-star-bg">
-                <?php for( $i = 0; $i < $star; $i++ ) {?>
+                @for( $i = 0; $i < $star; $i++ )
                     <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 32 32">
                             <path fill="#FDD835" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                         </svg>
                     </span>
-                <?php } ?>
+                @endfor
             </div>
         </div>
     </div>
@@ -63,8 +63,8 @@
         }
     </style>
     <div class="review-legend">
-        <strong class="review-score"><?php echo $star;?></strong><span class="review-muted">/</span><strong>5</strong>
-        <span class="review-muted">( </span><strong class="review-count"><?php echo $count;?></strong> <span class="review-muted">bình chọn</span><span class="review-muted"> )</span>
+        <strong class="review-score">{{ $star }}</strong><span class="review-muted">/</span><strong>5</strong>
+        <span class="review-muted">( </span><strong class="review-count">{{ $count }}</strong> <span class="review-muted">{{ trans('template.rating.voted') }}</span><span class="review-muted"> )</span>
     </div>
 </div>
 <script type="text/javascript" defer>
@@ -72,20 +72,24 @@
         let review = false;
         $('.review-post-star-ratings .review-stars-inactive .review-star').click(function(){
             if(review === true) {
-                show_message('Bạn đã đánh giá, không thể đánh giá lại', 'error');
+                SkilldoMessage.error('Bạn đã đánh giá, không thể đánh giá lại');
                 return false;
             }
             review = true;
             let box = $(this).closest('.review-post-star-ratings');
             let data = {
                 'action'        : 'Rating_Star_Ajax::reviewSave',
-                'object_type'   : '<?php echo $type;?>',
+                'object_type'   : '{{ $type }}',
                 'object_id'     : box.attr('data-id'),
                 'rating'        : $(this).attr('data-star'),
             };
-            $.post(ajax, data, function(){}, 'json').done(function(response){
-                show_message(response.message, response.status);
+
+            request.post(ajax, data).then(function(response) {
+
+                SkilldoMessage.response(response);
+
             });
+            
             return false;
         });
     });

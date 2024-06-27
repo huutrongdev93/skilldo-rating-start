@@ -5,16 +5,16 @@ class RatingStarTemplate {
         ?>
         <style>
             :root {
-                --star-color:<?php echo RatingStar::config('color.star');?>;
+                --star-color:<?php echo RatingStar::config('color_star');?>;
                 --star-align:<?php echo RatingStar::config('item_align');?>;
             }
         </style>
         <?php
     }
-    static function assets(): void
+    static function assets(AssetPosition $header, AssetPosition $footer): void
     {
-        Template::asset()->location('header')->add('rating-star', RATING_STAR_PATH.'/assets/rt-style.css', ['minify' => true]);
-        Template::asset()->location('footer')->add('micro-modal', RATING_STAR_PATH.'/assets/micromodal.min.js', ['minify' => false]);
+        $header->add('rating-star', RATING_STAR_PATH.'/assets/rt-style.css', ['minify' => true]);
+        $footer->add('micro-modal', RATING_STAR_PATH.'/assets/micromodal.min.js', ['minify' => false]);
     }
     static function adminAssets(): void
     {
@@ -27,5 +27,5 @@ class RatingStarTemplate {
 
 }
 add_action('cle_header', 'RatingStarTemplate::assetsVariable');
-add_action('init','RatingStarTemplate::assets', 30);
+add_action('theme_custom_assets','RatingStarTemplate::assets', 30, 2);
 add_action('admin_init','RatingStarTemplate::adminAssets', 100);

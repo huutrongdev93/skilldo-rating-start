@@ -1,10 +1,31 @@
 <?php
-class RatingStar extends Model {
+class RatingStar extends \SkillDo\Model\Model {
     
     static string $table = 'rating_star';
+
+    static array $columns = [
+        'name'          => ['string'],
+        'email'         => ['string'],
+        'title'         => ['string'],
+        'message'       => ['string'],
+        'star'          => ['int', 0],
+        'object_type'   => ['string', 'products'],
+        'object_id'     => ['int', 0],
+        'is_read'       => ['int', 0],
+        'parent_id'     => ['int', 0],
+        'status'        => ['string', 'public'],
+        'type'          => ['string', 'handmade'],
+        'user_id'       => ['int', 0],
+        'like'          => ['int', 0],
+    ];
+
+    static array $rules = [
+        'updated' => true,
+        'created' => true,
+    ];
     
-    static public function handleParams($args = null) {
-        
+    static function handleParams($args = null): Qr
+    {
         if(is_array($args)) {
             if(empty($args['object_type'])) {
                 $args['where']['object_type <>'] = 'comment';
@@ -19,80 +40,21 @@ class RatingStar extends Model {
         
         if($args instanceof Qr) $query = clone $args;
         
-        return (isset($query)) ? $query : null;
+        return (isset($query)) ? $query : new Qr;
     }
 
-    static public function insert($insertData = []) {
-
-        $model = model('rating_star');
-
-        $columnsTable = [
-            'name'          => ['string'],
-            'email'         => ['string'],
-            'title'         => ['string'],
-            'message'       => ['string'],
-            'star'          => ['int', 0],
-            'object_type'   => ['string', 'products'],
-            'object_id'     => ['int', 0],
-            'is_read'       => ['int', 0],
-            'parent_id'     => ['int', 0],
-            'status'        => ['string', 'public'],
-            'type'          => ['string', 'handmade'],
-            'user_id'       => ['int', 0],
-            'like'          => ['int', 0],
-        ];
-
-        $columnsTable = apply_filters('columns_db_'.self::$table, $columnsTable);
-
-        if(!empty($insertData['id'])) {
-
-            $id 		   = (int) $insertData['id'];
-
-            $update 	   = true;
-
-            $oldObject = RatingStar::get($id);
-
-            if (!$oldObject) return new SKD_Error( 'invalid_rating_star_id', __( 'ID đanh giá sao không chính xác.' ));
-        }
-        else {
-            $update = false;
-        }
-
-        $insertData = createdDataInsert($columnsTable, $insertData, (isset($oldObject)) ? $oldObject : null);
-
-        foreach ($columnsTable as $columnsKey => $columnsValue ) {
-            ${$columnsKey}  = $insertData[$columnsKey];
-        }
-
-        if(!empty($insertData['user_id'])) {
-            $user_id = (int)Str::clear($insertData['user_id']);
-        }
-        else if(Auth::check()) {
-            $user_id = Auth::userID();
-        }
-
-        $data = compact(array_keys($columnsTable));
-
-        $data = apply_filters('pre_insert_'.static::$table.'_data', $data, $insertData, $update ? $oldObject : null);
-
-        $model->settable('rating_star');
-
-        if($update) {
-            $data['updated'] = gmdate('Y-m-d H:i:s', time() + 7*3600);
-            $model->update( $data, Qr::set($id));
-        }
-        else {
-            $data['created'] = gmdate('Y-m-d H:i:s', time() + 7*3600);
-            $id = $model->add($data);
-        }
-
-        return $id;
-    }
-
-    static public function delete($id = ''): array|int
+    static function insert($insertData = [], object|null $oldObject = null): int|SKD_Error
     {
+        if(empty($insertData['user_id']) && Auth::check()) {
+            $insertData['user_id'] = Auth::userID();
+        }
 
-        $model = model('rating_star');
+        return parent::insert($insertData, $oldObject);
+    }
+
+    static function deleteById($id = ''): array|int
+    {
+        $model = model(static::$table);
 
         $rating_star = static::get($id);
 
@@ -100,7 +62,7 @@ class RatingStar extends Model {
 
             if($rating_star->object_type != 'comment') {
 
-                $count_rating_star = Metadata::get($rating_star->object_type, $rating_star->object_id, 'rating_star', true);
+                $count_rating_star = Metadata::get($rating_star->object_type, $rating_star->object_id, static::$table, true);
 
                 if (!have_posts($count_rating_star)) {
                     $count_rating_star = array('count' => 0, 'star' => 0);
@@ -111,13 +73,13 @@ class RatingStar extends Model {
 
                 if ($rating_star->status == 'public') {
 
-                    Metadata::update($rating_star->object_type, $rating_star->object_id, 'rating_star', $count_rating_star);
+                    Metadata::update($rating_star->object_type, $rating_star->object_id, static::$table, $count_rating_star);
                 }
 
-                model('rating_star')->delete(Qr::set('object_type', 'comment')->where('parent_id', $id));
+                model(static::$table)::delete(Qr::set('object_type', 'comment')->where('parent_id', $id));
             }
 
-            $model->settable('rating_star')->delete(Qr::set($id));
+            $model->table(static::$table)::delete(Qr::set($id));
 
             return [$id];
         }
@@ -125,25 +87,23 @@ class RatingStar extends Model {
         return 0;
     }
 
-    static public function deleteList($productID = []) {
+    static function deleteList($productID = []) {
         if(have_posts($productID)) {
             foreach ($productID as $id) {
-                static::delete($id);
+                static::deleteById($id);
             }
             return $productID;
         }
         return false;
     }
 
-    static public function config($key = '') {
+    static function config($key = '') {
 
         $setting = [
             'product_enable' => 1,
             'post_enable'    => 1,
             'has_approving'  => 0,
-            'color' => [
-                'star' => '#ffbe00',
-            ],
+            'color_star'     => '#ffbe00',
             'illegal_message' => '',
             'item_align'      => 'left',
             'item_position'   => 45,
@@ -173,11 +133,15 @@ class RatingStar extends Model {
 
         if(isset($option['illegal_message']))  $setting['illegal_message'] = $option['illegal_message'];
 
-        if(isset($option['color']))  $setting['color'] = array_merge($setting['color'], $option['color']);
-
         if(empty($option['autoDataType'])) $option['autoDataType'] = 'auto';
 
-        if(is_array($setting['color']['star'])) $setting['color']['star'] = '#ffbe00';
+        $optionStyle = Option::get('rating_star_style');
+
+        $setting['color_star'] = $optionStyle['color_star'] ?? $setting['color_star'];
+
+        $setting['item_align'] = $optionStyle['item_align'] ?? $setting['item_align'];
+
+        $setting['item_position'] = $optionStyle['item_position'] ?? $setting['item_position'];
 
         if(!empty($key)) {
             return Arr::get($setting, $key);
@@ -186,7 +150,7 @@ class RatingStar extends Model {
         return $setting;
     }
 
-    static public function random(): array
+    static function random(): array
     {
 
         include_once RATING_STAR_PATH.'/includes/BiasRandom.php';
@@ -273,7 +237,7 @@ class RatingStar extends Model {
         return $dataRandom;
     }
 
-    static public function starLabel($star = 1) {
+    static function starLabel($star = 1) {
         $label = [
             1 => __('Rất không hài lòng'),
             2 => __('Không hài lòng'),

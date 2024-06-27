@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Database\Schema\Blueprint;
+
 if(!Admin::is()) return;
 function Rating_Star_update_core(): void
 {
@@ -16,93 +19,143 @@ add_action('admin_init', 'Rating_Star_update_core');
 Class Rating_Star_Update_Version {
     public function runUpdate($DiscountVersion): void
     {
-        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2', '4.5.0'];
-        $model          = get_model();
+        $listVersion    = ['2.0.0', '3.0.0', '4.0.0', '4.2.0', '4.3.0', '4.4.0', '4.4.2', '4.5.0', '4.6.0'];
+        $model          = model();
         foreach ($listVersion as $version) {
             if(version_compare($version, $DiscountVersion) == 1) {
-                $function = 'update_Version_'.str_replace('.','_',$version);
+                $function = 'update_version_'.str_replace('.','_',$version);
                 if(method_exists($this, $function)) $this->$function($model);
             }
         }
         Option::update('rating_star_version', RATING_STAR_VERSION );
     }
-    public function update_Version_2_0_0($model): void
+    public function update_version_2_0_0($model): void
     {
-        Rating_Star_Update_Database::Version_2_0_0($model);
+        Rating_Star_Update_Database::version_2_0_0($model);
     }
-    public function update_Version_3_0_0($model): void
+    public function update_version_3_0_0($model): void
     {
-        Rating_Star_Update_Database::Version_3_0_0($model);
+        Rating_Star_Update_Database::version_3_0_0($model);
     }
-    public function update_Version_4_0_0($model): void
+    public function update_version_4_0_0($model): void
     {
-        Rating_Star_Update_Files::Version_4_0_0($model);
-        Rating_Star_Update_Database::Version_4_0_0($model);
+        Rating_Star_Update_Files::version_4_0_0($model);
+        Rating_Star_Update_Database::version_4_0_0($model);
     }
-    public function update_Version_4_2_0($model): void
+    public function update_version_4_2_0($model): void
     {
-        Rating_Star_Update_Database::Version_4_2_0($model);
+        Rating_Star_Update_Database::version_4_2_0($model);
     }
-    public function update_Version_4_3_0($model): void
+    public function update_version_4_3_0($model): void
     {
-        Rating_Star_Update_Database::Version_4_3_0($model);
+        Rating_Star_Update_Database::version_4_3_0($model);
     }
-    public function update_Version_4_4_0($model): void
+    public function update_version_4_4_0($model): void
     {
-        Rating_Star_Update_Files::Version_4_4_0($model);
+        Rating_Star_Update_Files::version_4_4_0($model);
     }
-    public function update_Version_4_4_2($model): void
+    public function update_version_4_4_2($model): void
     {
-        Rating_Star_Update_Database::Version_4_4_2($model);
+        Rating_Star_Update_Database::version_4_4_2($model);
     }
-    public function update_Version_4_5_0($model): void
+    public function update_version_4_5_0($model): void
     {
-        Rating_Star_Update_Files::Version_4_5_0();
+        Rating_Star_Update_Files::version_4_5_0();
+    }
+    public function update_version_4_6_0($model): void
+    {
+        Rating_Star_Update_Database::version_4_6_0($model);
     }
 }
 Class Rating_Star_Update_Database {
-    public static function Version_2_0_0($model) {
-        if(!model()::schema()->hasColumn('rating_star', 'is_read')) {
-            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `is_read` INT NOT NULL DEFAULT '1' AFTER `status`;");
-            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `parent_id` INT NOT NULL DEFAULT '0' AFTER `status`;");
+
+    static function version_2_0_0($model): void
+    {
+        if(!schema()->hasColumn('rating_star', 'is_read')) {
+
+            schema()->table('rating_star', function(Blueprint $table) {
+                $table->integer('is_read')->default(1)->after('status');
+                $table->integer('parent_id')->default(0)->after('status');
+            });
+
             $model->query("UPDATE `".CLE_PREFIX."rating_star` SET `is_read`= '1' WHERE 1;");
         }
     }
-    public static function Version_3_0_0($model) {
-        if(!model()::schema()->hasColumn('rating_star', 'user_id')) {
-            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `user_id` INT NOT NULL DEFAULT '0' AFTER `status`;");
+
+    static function version_3_0_0($model): void
+    {
+        if(!schema()->hasColumn('rating_star', 'user_id')) {
+            schema()->table('rating_star', function(Blueprint $table) {
+                $table->integer('user_id')->default(0)->after('status');
+            });
         }
     }
-    public static function Version_4_0_0($model) {
-        if(!model()::schema()->hasColumn('rating_star', 'like')) {
-            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `like` INT NOT NULL DEFAULT '0' AFTER `user_id`;");
+
+    static function version_4_0_0($model): void
+    {
+        if(!schema()->hasColumn('rating_star', 'like')) {
+            schema()->table('rating_star', function(Blueprint $table) {
+                $table->integer('like')->default(0)->after('user_id');
+            });
         }
         $rating = Option::get('rating_star_setting');
         $rating['template'] = 'template1';
         Option::update('rating_star_setting', $rating);
     }
-    public static function Version_4_2_0($model) {
-        $model->setTable('rating_star')->update(['object_type' => 'products'], Qr::set('object_type', 'product'));
-    }
-    public static function Version_4_3_0($model) {
-        if(!model()::schema()->hasColumn('rating_star', 'type')) {
 
-            model()::schema()->table('rating_star', function($table) {
+    static function version_4_2_0($model): void
+    {
+        $model->table('rating_star')::where('object_type', 'product')->update(['object_type' => 'products']);
+    }
+
+    static function version_4_3_0($model): void
+    {
+        if(!schema()->hasColumn('rating_star', 'type')) {
+
+            schema()->table('rating_star', function($table) {
                 $table->string('type', '100')->default('handmade');
             });
 
-            $model->setTable('rating_star')->update(['type' => 'auto', 'status' => 'public'], Qr::set('status', 'auto'));
+            $model->table('rating_star')::where('status', 'auto')->update(['type' => 'auto', 'status' => 'public']);
         }
     }
 
-    public static function Version_4_4_2($model) {
-        if(!model()::schema()->hasColumn('rating_star', 'like')) {
-            $model->query("ALTER TABLE `".CLE_PREFIX."rating_star` ADD `like` INT NOT NULL DEFAULT '0' AFTER `user_id`;");
+    static function version_4_4_2($model): void
+    {
+        if(!schema()->hasColumn('rating_star', 'like'))
+        {
+            schema()->table('rating_star', function($table) {
+                $table->integer('like')->default(0)->after('user_id');
+            });
         }
     }
+
+    static function version_4_6_0($model): void
+    {
+        $setting = Option::get('rating_star_setting');
+
+        $options = model('system')::where('option_name', 'theme_option')->first();
+
+        $options = unserialize($options->option_value);
+
+        $setting = [
+            'star_color'      => $setting['star']['color'] ?? '#ffbe00',
+            'item_align'      => $setting['item_align'] ?? 'left',
+            'item_position'   => $setting['item_position'] ?? 45,
+        ];
+
+        $options['rating_star_style'] = $setting;
+
+        model('system')::where('option_name', 'theme_option')->update([
+            'option_value' => serialize($options)
+        ]);
+
+        CacheHandler::delete('system');
+    }
 }
+
 Class Rating_Star_Update_Files {
-    static function Version_4_0_0($model): void
+    static function version_4_0_0($model): void
     {
         $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
         $Files = [
@@ -118,7 +171,7 @@ Class Rating_Star_Update_Files {
             }
         }
     }
-    static function Version_4_4_0($model): void
+    static function version_4_4_0($model): void
     {
         $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
         $Files = [
@@ -132,7 +185,7 @@ Class Rating_Star_Update_Files {
             }
         }
     }
-    static function Version_4_5_0(): void
+    static function version_4_5_0(): void
     {
         $path = FCPATH.VIEWPATH.'plugins/'.RATING_STAR_NAME.'/';
         $Files = [

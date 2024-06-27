@@ -2,42 +2,48 @@
     <div class="rating-star-review">
         <div class="rsr__left">
             <div class="review__info">
-                <span class="number"><?php echo $star;?>.0</span>
+                <span class="number">{{ $star }}.0</span>
                 <span class="star">
-                    <?php for( $i = 0; $i < $star; $i++ ) {?>
+                    @for( $i = 0; $i < $star; $i++ )
                         <i class="fal fa-star" aria-hidden="true" style="color:var(--star-color); font-weight: bold;"></i>&nbsp;
-                    <?php } ?>
-                    <?php for( $i = 0; $i < (5 - $star); $i++ ) {?>
+                    @endfor
+                    @for( $i = 0; $i < (5 - $star); $i++ )
                         <i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i>&nbsp;
-                    <?php } ?>
+                    @endfor
                 </span>
-                <span class="text"><?php echo $count;?> <?php echo __('đánh giá', 'rating_rate');?></span>
+                <span class="text">{{ $count }} {{ trans('template.rating.rate') }}</span>
             </div>
-            <?php for ($i = 5; $i > 0 ; $i--) { ?>
-                <?php
-                if($count == 0) {
-                    $count_item_star = 0; $percent = 0;
-                }
-                else {
+            @for ($i = 5; $i > 0 ; $i--) 
+                @if($count == 0) 
+                    @php
+                    $count_item_star = 0;
+                    $percent = 0;
+                    @endphp
+                @else
+                    @php
                     $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
-                    $percent = ceil($count_item_star/$count*100);
-                }
-                ?>
+                    $percent = round($count_item_star/$count*100);
+                    @endphp
+                @endif
                 <div class="r">
                     <span class="t">
-                        <?php for( $num = 0; $num < $i; $num++ ) {?><i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i><?php } ?>
-                        <?php for( $num = 0; $num < (5-$i); $num++ ) {?><i class="fal fa-star" style="color:var(--star-color);"></i><?php } ?>
+                        @for( $num = 0; $num < $i; $num++ ) 
+                            <i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i>
+                        @endfor
+                        @for( $num = 0; $num < (5-$i); $num++ ) 
+                            <i class="fal fa-star" style="color:var(--star-color);"></i>
+                        @endfor
                     </span>
-                    <div class="bgb"> <div class="bgb-in" style="width: <?php echo $percent;?>%"></div> </div>
-                    <span class="c"><strong><b><?php echo $percent;?>%</b> | <?php echo $count_item_star;?></strong></span>
+                    <div class="bgb"> <div class="bgb-in" style="width: {{ $percent }}%"></div> </div>
+                    <span class="c"><strong><b>{{ $percent }}%</b> | {{ $count_item_star }}</strong></span>
                 </div>
-            <?php } ?>
+            @endfor
         </div>
         <div class="rsr__right">
             <div class="row">
                 <div class="form-group col-md-12 text-center">
-                    <p class="text-center"><span class="text">Có <?php echo $count;?> <?php echo __('đánh giá', 'rating_rate');?></span></p>
-                    <button type="button" class="btn btn-theme btn-effect-default btn-block js_rating_star_btn__review"><?php echo __('Gửi đánh giá của bạn');?></button>
+                    <p class="text-center"><span class="text">{{ trans('template.rating.rate.count', ['count' => $count]) }}</span></p>
+                    <button type="button" class="btn btn-theme btn-effect-default btn-block js_rating_star_btn__review">{{ trans('template.rating.attach') }}</button>
                 </div>
             </div>
         </div>
@@ -48,19 +54,19 @@
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
             <header class="modal__header">
-                <h2 class="modal__title">ĐÁNH GIÁ <?php echo $objectName;?></h2>
+                <h2 class="modal__title">{{ trans('template.rating.rate') }} {{ $objectName }}</h2>
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <div class="modal__content js_rating_star_modal__review">
                 <div class="rating-reviews__success">
                     <div class="text-center">
-                        <?php Template::img(Url::base(RATING_STAR_PATH.'/assets/images/success.png'));?>
-                        <p>Cám ơn bạn đã gửi đánh giá cho chúng tôi! Đánh giá của bạn sẻ giúp chúng tôi cải thiện chất lượng dịch vụ hơn nữa.</p>
+                        {!!Template::img(Url::base(RATING_STAR_PATH.'/assets/images/success.png')) !!}
+                        <p>{{ trans('template.rating.success') }}.</p>
                     </div>
                 </div>
                 <form class="review-form" method="post" enctype="multipart/form-data" id="rating-reviews__form" autocomplete="off">
-                    <input name="object_id" type="hidden" value="<?php echo $object->id;?>">
-                    <input name="object_type" type="hidden" value="<?php echo $type;?>">
+                    <input name="object_id" type="hidden" value="{{ $object->id }}">
+                    <input name="object_type" type="hidden" value="{{ $type }}">
                     <div class="rating">
                         <label class="selected">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
@@ -95,43 +101,43 @@
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="<?php echo __('Hãy chia sẻ những điều bạn thích về sản phẩm này nhé', 'rating_placeholder_message');?>"></textarea>
+                            <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="{{ trans('template.rating.message.placeholder', ['name' => $objectName]) }}"></textarea>
                         </div>
-                        <?php if(!Auth::check()) {?>
+                        @if(!Auth::check())
                         <div class="form-group col-md-6">
-                            <input name="rating_star_name" value="<?php echo $form['name'];?>" type="text" class="form-control" placeholder="<?php echo __('Họ tên của bạn', 'rating_placeholder_name');?>" required <?php if(Auth::check()) echo 'readonly';?>>
+                            <input name="rating_star_name" value="{{ $form['name'] }}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
                         </div>
                         <div class="form-group col-md-6">
-                            <input name="rating_star_email" value="<?php echo $form['email'];?>" type="email" class="form-control" placeholder="<?php echo __('Email của bạn', 'rating_placeholder_email');?>" required <?php if(Auth::check()) echo 'readonly';?>>
+                            <input name="rating_star_email" value="{{ $form['email'] }}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
                         </div>
-                        <?php } ?>
+                        @endif
                         <div class="form-group col-md-12 review-attach-box">
-                            <div class="review-attach-text"><span class="btn-attach js_rating_star_insert_attach"><?php echo __('Gửi ảnh thực tế', 'rating_upload_image');?></span></div>
+                            <div class="review-attach-text"><span class="btn-attach js_rating_star_insert_attach">{{ trans('template.rating.attach') }}</span></div>
                             <div class="review-attach-list">
-                                <?php for($i = 1; $i <= 5; $i++) {?>
+                                @for($i = 1; $i <= 5; $i++)
                                     <div class="uploader">
                                         <div class="input-wrapper input-wrapper--button">
                                             <div class="input-group">
-                                                <input type="file" name="attach[]" class="input__upload" id="attach_file_<?php echo $i;?>">
-                                                <label class="uploader-review" for="attach_file_<?php echo $i;?>"><i class="fal fa-plus"></i></label>
+                                                <input type="file" name="attach[]" class="input__upload" id="attach_file_{{ $i }}">
+                                                <label class="uploader-review" for="attach_file_{{ $i }}"><i class="fal fa-plus"></i></label>
                                                 <div class="remove-file"><i class="fal fa-times"></i></div>
                                             </div>
                                         </div>
                                     </div>
-                                <?php } ?>
+                                @endfor
                                 <div class="clearfix"></div>
                                 <div class="col-md-12">
-                                    <p style="text-align: center; font-size: 12px; margin-top: 10px;"><?php echo __('Chỉ chấp nhận JPEG, JPG, PNG. Dung lượng không quá 2Mb mỗi hình', 'rating_upload_image_validation');?></p>
+                                    <p style="text-align: center; font-size: 12px; margin-top: 10px;">{{ trans('template.rating.attach.rule') }}</p>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group col-md-12">
-                            <button type="submit" class="btn btn-theme btn-effect-default d-block" style="width: 100%;"><?php echo __('Gửi');?></button>
+                            <button type="submit" class="btn btn-theme btn-effect-default d-block" style="width: 100%;">{{ trans('general.send') }}</button>
                         </div>
                     </div>
                 </form>
             </div>
-            <?php echo Admin::loading();?>
+            {!! Admin::loading() !!}
         </div>
     </div>
 </div>
@@ -253,7 +259,7 @@
         font-weight: 700;
         padding: 5px 0 5px 32px;
         display: block;
-        background: transparent url('<?php echo RATING_STAR_PATH.'/assets/images/icon-image.png';?>') no-repeat left center;
+        background: transparent url('{{ RATING_STAR_PATH.'/assets/images/icon-image.png' }}') no-repeat left center;
         background-size: 25px auto;
         -moz-background-size: 25px auto;
         -webkit-background-size: 25px auto;
@@ -308,13 +314,13 @@
                 }
             }
             if(validate === false) {
-                show_message('Ảnh không đúng định dạng.','error');
+                SkilldoMessage.error('Ảnh không đúng định dạng.');
                 return false;
             }
             let size = $(this)[0].files[0].size;
             size = size / 1024 / 1024;
             if(size > 2) {
-                show_message('Ảnh của bạn lớn hơn kích thước cho phép.','error');
+                SkilldoMessage.error('Ảnh của bạn lớn hơn kích thước cho phép.');
                 return false;
             }
             readURL($(this), this);
@@ -388,7 +394,7 @@
                         $('.rating-reviews__success').show();
                     }
                     else {
-                        show_message(response.message, response.status);
+                        SkilldoMessage.error(response.message);
                     }
                     form.trigger('reset');
                 }

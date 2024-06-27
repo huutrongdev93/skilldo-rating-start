@@ -1,20 +1,21 @@
 <?php
+
+use JetBrains\PhpStorm\NoReturn;
+use SkillDo\Validate\Rule;
+
 Class Rating_Star_Ajax {
-    static public function reviewLoad($ci, $model): bool
+    #[NoReturn]
+    static function reviewLoad(SkillDo\Http\Request $request, $model): void
     {
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Lưu dữ liệu không thành công';
+            $id     =  (int)$request->input('object_id');
 
-        if(Request::post()) {
+            $page     =  (int)$request->input('page');
 
-            $id     =  (int)Request::Post('object_id');
+            $type   =  $request->input('object_type');
 
-            $page     =  (int)Request::Post('page');
-
-            $type   =  Request::Post('object_type');
-
-            $sort   =  Request::Post('sort');
+            $sort   =  $request->input('sort');
 
             $review_in_page = 3;
 
@@ -48,7 +49,7 @@ Class Rating_Star_Ajax {
 
                 $reviews = RatingStar::gets($args);
 
-                $result['review'] = '';
+                $resultReview = '';
 
                 $reply = true;
 
@@ -60,56 +61,49 @@ Class Rating_Star_Ajax {
 
                     $review->reply = RatingStar::gets(Qr::set('parent_id', $review->id)->where('object_type', 'comment'));
 
-                    ob_start();
-
-                    Plugin::partial(RATING_STAR_NAME, 'review-item', ['type' => $type, 'review' => $review, 'reply' => $reply]);
-
-                    $result['review'] .= ob_get_contents();
-
-                    ob_end_clean();
+                    $resultReview .= Plugin::partial(RATING_STAR_NAME, 'review-item', [
+                        'type'  => $type,
+                        'review' => $review,
+                        'reply' => $reply
+                    ]);
                 }
 
-                $result['pagination']   = $pagination->frontend();
-
-                $result['status'] = 'success';
+                response()->success(trans('ajax.load.success'), [
+                    'pagination' => $pagination->frontend(),
+                    'review' => $resultReview,
+                ]);
             }
             else {
-                $result['review'] = notice('warning', __('Không có review nào', 'rating_message_empty_review'));
 
-                $result['pagination']   = '';
-
-                $result['status'] = 'success';
+                response()->success(trans('ajax.load.success'), [
+                    'pagination' => '',
+                    'review' => Admin::alert('warning', trans('messages.rating.review.empty')),
+                ]);
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.load.error'));
     }
-    static public function reviewSave($ci, $model): bool
+    
+    #[NoReturn]
+    static function reviewSave(SkillDo\Http\Request $request, $model): void
     {
-        $result['status'] = 'error';
-        $result['message'] = 'Lưu dữ liệu không thành công.';
-        if(Request::post()) {
+        if($request->isMethod('post')) {
 
-            $id     = (int)Request::post('object_id');
+            $id     = (int)$request->input('object_id');
 
-            $type   = Request::post('object_type');
+            $type   = $request->input('object_type');
 
             $module = Rating_Star::module($type);
 
             if(empty($module)) {
-                $result['message'] = 'Loại đánh giá này chưa được đăng ký';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.module.notFound'));
             }
 
             $object = $module['class']::get($id);
 
             if(!have_posts($object)) {
-                $result['message'] = 'Không có đối tượng để đánh giá';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.object.notFound'));
             }
 
             $rating = [];
@@ -118,9 +112,9 @@ Class Rating_Star_Ajax {
 
             $rating['object_type']  = $type;
 
-            $rating['star']         = (int)Request::post('rating');
+            $rating['star']         = (int)$request->input('rating');
 
-            $rating['message']      = Request::post('rating_star_message');
+            $rating['message']      = $request->input('rating_star_message');
 
             if(Auth::check()) {
                 $user_current       = Auth::user();
@@ -129,39 +123,33 @@ Class Rating_Star_Ajax {
                 $rating['user_id']  = $user_current->id;
             }
             else {
-                $rating['name']     = Request::post('rating_star_name');
-                $rating['email']    = Request::post('rating_star_email');
+                $rating['name']     = $request->input('rating_star_name');
+                $rating['email']    = $request->input('rating_star_email');
                 if($type == 'post' && empty($rating['name'])) {
                     $rating['name']    = 'guest';
                     $rating['email']   = 'guest_no_isset@empty';
-                    $rating['message'] =  'Đanh giá bài viết '.RatingStar::starLabel($rating['star']);
+                    $rating['message'] =  'Đánh giá bài viết '.RatingStar::starLabel($rating['star']);
                 }
             }
 
-            if(empty($rating['email']) && !empty(Request::post('email'))) {
-                $rating['email'] = trim(Request::post('email'));
+            if(empty($rating['email']) && !empty($request->input('email'))) {
+                $rating['email'] = trim($request->input('email'));
             }
 
             if($type == 'post' && empty($rating['message'])) {
-                $rating['message'] =  'Đanh giá bài viết '.RatingStar::starLabel($rating['star']);
+                $rating['message'] =  'Đánh giá bài viết '.RatingStar::starLabel($rating['star']);
             }
 
             if(empty($rating['name'])) {
-                $result['message'] = 'Không được để trống tên của bạn.';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.name.empty'));
             }
 
             if(empty($rating['email'])) {
-                $result['message'] = 'Không được để trống email của bạn.';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.email.empty'));
             }
 
             if(isset($rating['message']) && strlen($rating['message']) < 10) {
-                $result['message'] = 'Nội dung đánh giá quá ngắn.';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.message.empty'));
             }
 
             if(!empty($illegal_message)) {
@@ -169,19 +157,15 @@ Class Rating_Star_Ajax {
                 if (have_posts($illegal_message)) {
                     foreach ($illegal_message as $illegal) {
                         $illegal = trim($illegal);
-                        if (!empty($illegal) && strpos($rating['message'], $illegal) !== false) {
-                            $result['message'] = 'Xin lỗi, Nội dung đánh giá có chứa từ không được phép sử dụng.';
-                            echo json_encode($result);
-                            return false;
+                        if (!empty($illegal) && str_contains($rating['message'], $illegal)) {
+                            response()->error(trans('messages.rating.review.message.illegal'));
                         }
                     }
                 }
             }
 
             if($rating['star'] <= 0 || $rating['star'] > 5) {
-                $result['message'] = 'Số sao đánh giá không hợp lệ.';
-                echo json_encode($result);
-                return false;
+                response()->error(trans('messages.rating.review.star.illegal'));
             }
 
             $has_approving  = RatingStar::config('has_approving');
@@ -191,66 +175,34 @@ Class Rating_Star_Ajax {
             $errors = apply_filters('rating_star_save_error', [], $rating);
 
             if(is_skd_error($errors)) {
-                foreach ($errors->errors as $error_key => $error_value) {
-                    $result['message'] = $error_value[0];
-                }
-                echo json_encode($result);
-                return false;
+                response()->error($errors);
             }
 
             $id = RatingStar::insert($rating);
 
             if(!is_skd_error($id)) {
 
-                if(isset($_FILES['attach']) && have_posts($_FILES['attach'])) {
+                if($request->hasFile('attach')) {
 
                     if (!file_exists('uploads/rating-star')) {
                         mkdir('uploads/rating-star', 0777, true);
                     }
 
-                    $config['upload_path']		= 'uploads/rating-star';
+                    $validate = $request->validate([
+                        'attach.*' => Rule::make('File')->file(['jpeg','jpg','png'], ['max' => '2MB']),
+                    ]);
 
-                    $config['allowed_types']	= 'jpeg|jpg|png';
+                    if ($validate->fails()) {
+                        response()->error($validate->errors());
+                    }
 
-                    $config['remove_spaces']	= true;
-
-                    $config['detect_mime']      = true;
-
-                    $config['mod_mime_fix']		= true;
-
-                    $config['max_size']     	= '20000';
-
-                    $ci->load->library('upload', $config);
+                    $attaches = $request->file('attach');
 
                     $images = [];
 
-                    foreach ($_FILES['attach']['name'] as $key => $image) {
-
-                        if(empty($image)) continue;
-
-                        $extension = FileHandler::extension($image);
-
-                        if($extension == 'unknown') continue;
-
-                        $_FILES['images[]']['name']     = $_FILES['attach']['name'][$key];
-
-                        $_FILES['images[]']['type']     = $_FILES['attach']['type'][$key];
-
-                        $_FILES['images[]']['tmp_name'] = $_FILES['attach']['tmp_name'][$key];
-
-                        $_FILES['images[]']['error']    = $_FILES['attach']['error'][$key];
-
-                        $_FILES['images[]']['size']     = $_FILES['attach']['size'][$key];
-
-                        $fileName = Str::slug(basename($image, '.'.$extension)).'-'.time().'.'.$extension;
-
-                        $config['file_name'] = $fileName;
-
-                        $ci->upload->initialize($config);
-
-                        if ($ci->upload->do_upload('images[]')) {
-                            $images[$config['upload_path'].'/'.$fileName] = $fileName;
-                        }
+                    foreach ($attaches as $key => $file) {
+                        $path = $file->store('rating-star');
+                        $images['uploads/'.$path] = str_replace('rating-star/', '', $path);
                     }
 
                     if(have_posts($images)) {
@@ -276,27 +228,22 @@ Class Rating_Star_Ajax {
 
                 do_action('rating_star_save_success', $id, $rating);
 
-                $result['status'] = 'success';
-
-                $result['message'] = 'Cám ơn bạn đã gửi đanh giá cho chúng tôi.';
+                response()->success(trans('messages.rating.review.success'));
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.save.error'));
     }
-    static public function reviewReply($ci, $model) {
+    
+    #[NoReturn]
+    static function reviewReply(SkillDo\Http\Request $request, $model): void
+    {
 
-        $result['status'] = 'error';
+        if($request->isMethod('post')) {
 
-        $result['message'] = 'Lưu dữ liệu không thành công';
+            $data = $request->input();
 
-        if(Request::post()) {
-
-            $data = Request::post();
-
-            $id = (int)Request::post('id');
+            $id = (int)$request->input('id');
 
             $rating_star = RatingStar::get($id);
 
@@ -311,29 +258,25 @@ Class Rating_Star_Ajax {
                     $rating['user_id']        = $user_current->id;
                 }
                 else {
-                    $rating['name'] = Request::post('rating_star_name');
 
-                    if(empty($rating['name'])) {
-                        $result['message'] = 'Không được để trống tên của bạn.';
-                        echo json_encode($result);
-                        return false;
+                    $validate = $request->validate([
+                        'rating_star_name' => Rule::make('Tên')->notEmpty(),
+                        'rating_star_email' => Rule::make('Email')->notEmpty()->email(),
+                    ]);
+
+                    if ($validate->fails()) {
+                        response()->error($validate->errors());
                     }
 
-                    $rating['email'] = Request::post('rating_star_email');
+                    $rating['name'] = $request->input('rating_star_name');
 
-                    if(empty($rating['email'])) {
-                        $result['message'] = 'Không được để trống email của bạn.';
-                        echo json_encode($result);
-                        return false;
-                    }
+                    $rating['email'] = $request->input('rating_star_email');
                 }
 
                 $rating['message']     = Str::clear($data['rating_star_message']);
 
                 if(strlen($rating['message']) < 10) {
-                    $result['message'] = 'Nội dung đánh giá quá ngắn.';
-                    echo json_encode($result);
-                    return false;
+                    response()->error(trans('messages.rating.review.message.empty'));
                 }
 
                 if(!empty($illegal_message)) {
@@ -341,10 +284,8 @@ Class Rating_Star_Ajax {
                     if (have_posts($illegal_message)) {
                         foreach ($illegal_message as $illegal) {
                             $illegal = trim($illegal);
-                            if (!empty($illegal) && strpos($rating['message'], $illegal) !== false) {
-                                $result['message'] = 'Xin lỗi, Nội dung đánh giá có chứa từ không được phép sử dụng.';
-                                echo json_encode($result);
-                                return false;
+                            if (!empty($illegal) && str_contains($rating['message'], $illegal)) {
+                                response()->error(trans('messages.rating.review.message.illegal'));
                             }
                         }
                     }
@@ -364,38 +305,42 @@ Class Rating_Star_Ajax {
 
                 if(!is_skd_error($id)) {
 
-                    $result['status'] = 'success';
-
-                    $result['message'] = 'Đăng câu trả lời thành công.';
+                    response()->success(trans('rating.reply.success'));
                 }
             }
         }
 
-        echo json_encode($result);
-
-        return true;
+        response()->error(trans('ajax.save.error'));
     }
-    static public function reviewLike($ci, $model): bool
+    
+    #[NoReturn]
+    static function reviewLike(SkillDo\Http\Request $request, $model): void
     {
-        $result['status'] = 'error';
-        $result['message'] = 'Lưu dữ liệu không thành công';
-        if(Request::post()) {
-            $id = (int)Request::post('id');
+        if($request->isMethod('post')) {
+
+            $id = (int)$request->input('id');
+
             $rating_star = RatingStar::get($id);
+
             if(have_posts($rating_star)) {
+
                 $rating['id']    = $id;
+
                 $rating['like']  = $rating_star->like + 1;
-                $id = RatingStar::insert($rating);
+
+                $id = RatingStar::insert($rating, $rating_star);
+
                 if(!is_skd_error($id)) {
-                    $result['status'] = 'success';
-                    $result['message'] = 'Cập nhật dữ liệu thành công.';
+
+                    response()->error(trans('ajax.save.success'));
                 }
             }
         }
-        echo json_encode($result);
-        return true;
+
+        response()->error(trans('ajax.save.error'));
     }
 }
+
 Ajax::client('Rating_Star_Ajax::reviewLoad');
 Ajax::client('Rating_Star_Ajax::reviewSave');
 Ajax::client('Rating_Star_Ajax::reviewReply');

@@ -84,7 +84,7 @@ Class Rating_Star_Ajax {
 
         response()->error(trans('ajax.load.error'));
     }
-    
+
     #[NoReturn]
     static function reviewSave(SkillDo\Http\Request $request, $model): void
     {
@@ -219,9 +219,9 @@ Class Rating_Star_Ajax {
                         $rating_star_product = ['count' => 0, 'star'  => 0];
                     }
 
-                    $rating_star_product['count'] += 1;
+                    $rating_star_product['count'] = RatingStar::where('object_type', $type)->where('object_id', $rating['object_id'])->amount();
 
-                    $rating_star_product['star']  += $rating['star'];
+                    $rating_star_product['star']  = RatingStar::where('object_type', $type)->where('object_id', $rating['object_id'])->sum('star');
 
                     Metadata::update($type, $rating['object_id'], 'rating_star', $rating_star_product);
                 }
@@ -234,7 +234,7 @@ Class Rating_Star_Ajax {
 
         response()->error(trans('ajax.save.error'));
     }
-    
+
     #[NoReturn]
     static function reviewReply(SkillDo\Http\Request $request, $model): void
     {
@@ -312,7 +312,7 @@ Class Rating_Star_Ajax {
 
         response()->error(trans('ajax.save.error'));
     }
-    
+
     #[NoReturn]
     static function reviewLike(SkillDo\Http\Request $request, $model): void
     {

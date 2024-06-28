@@ -13,24 +13,24 @@
                 </span>
                 <span class="text">{{ $count }} {{ trans('template.rating.rate') }}</span>
             </div>
-            @for ($i = 5; $i > 0 ; $i--) 
-                @if($count == 0) 
+            @for ($i = 5; $i > 0 ; $i--)
+                @if($count == 0)
                     @php
-                    $count_item_star = 0;
-                    $percent = 0;
+                        $count_item_star = 0;
+                        $percent = 0;
                     @endphp
                 @else
                     @php
-                    $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
-                    $percent = round($count_item_star/$count*100);
+                        $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
+                        $percent = round($count_item_star/$count*100);
                     @endphp
                 @endif
                 <div class="r">
                     <span class="t">
-                        @for( $num = 0; $num < $i; $num++ ) 
+                        @for( $num = 0; $num < $i; $num++ )
                             <i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i>
                         @endfor
-                        @for( $num = 0; $num < (5-$i); $num++ ) 
+                        @for( $num = 0; $num < (5-$i); $num++ )
                             <i class="fal fa-star" style="color:var(--star-color);"></i>
                         @endfor
                     </span>
@@ -104,12 +104,12 @@
                             <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="{{ trans('template.rating.message.placeholder', ['name' => $objectName]) }}"></textarea>
                         </div>
                         @if(!Auth::check())
-                        <div class="form-group col-md-6">
-                            <input name="rating_star_name" value="{{ $form['name'] }}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <input name="rating_star_email" value="{{ $form['email'] }}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
-                        </div>
+                            <div class="form-group col-md-6">
+                                <input name="rating_star_name" value="{{ $form['name'] }}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <input name="rating_star_email" value="{{ $form['email'] }}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
+                            </div>
                         @endif
                         <div class="form-group col-md-12 review-attach-box">
                             <div class="review-attach-text"><span class="btn-attach js_rating_star_insert_attach">{{ trans('template.rating.attach') }}</span></div>
@@ -314,13 +314,13 @@
                 }
             }
             if(validate === false) {
-                SkilldoMessage.error('Ảnh không đúng định dạng.');
+                SkilldoMessage.error(lang.get('rating.attach.extension'));
                 return false;
             }
             let size = $(this)[0].files[0].size;
             size = size / 1024 / 1024;
             if(size > 2) {
-                SkilldoMessage.error('Ảnh của bạn lớn hơn kích thước cho phép.');
+                SkilldoMessage.error(lang.get('rating.attach.size'));
                 return false;
             }
             readURL($(this), this);

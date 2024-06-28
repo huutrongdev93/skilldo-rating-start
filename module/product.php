@@ -67,8 +67,8 @@ Class Rating_Star_Product {
 
     static function template($total_count, $total_star): void {
         Plugin::view(RATING_STAR_NAME, 'review-star', [
-			'total_star' => $total_star,
-			'total_count' => $total_count
+            'total_star' => $total_star,
+            'total_count' => $total_count
         ]);
     }
     static function get($args = null) {

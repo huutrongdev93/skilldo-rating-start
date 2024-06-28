@@ -16,20 +16,20 @@
             @for( $i = 5; $i > 0 ; $i--)
                 @if($count == 0)
                     @php
-                    $count_item_star = 0; $percent = 0;
+                        $count_item_star = 0; $percent = 0;
                     @endphp
-                @else 
+                @else
                     @php
-                    $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
-                    $percent = round($count_item_star/$count*100);
+                        $count_item_star = RatingStar::count(Qr::set('star', $i)->where('object_type', $type)->where('object_id', $object->id));
+                        $percent = round($count_item_star/$count*100);
                     @endphp
                 @endif
                 <div class="r">
                     <span class="t">
-                        @for( $num = 0; $num < $i; $num++ ) 
-                            <i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i> 
+                        @for( $num = 0; $num < $i; $num++ )
+                            <i class="fal fa-star" style="color:var(--star-color); font-weight: bold;"></i>
                         @endfor
-                        @for( $num = 0; $num < (5-$i); $num++ ) 
+                        @for( $num = 0; $num < (5-$i); $num++ )
                             <i class="fal fa-star" style="color:var(--star-color);"></i>
                         @endfor
                     </span>
@@ -71,12 +71,12 @@
 
                 <div class="row">
                     @if(!Auth::check())
-                    <div class="form-group col-md-6">
-                        <input name="rating_star_name" value="{{ $form['name']}}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <input name="rating_star_email" value="{{ $form['email']}}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
-                    </div>
+                        <div class="form-group col-md-6">
+                            <input name="rating_star_name" value="{{ $form['name']}}" type="text" class="form-control" placeholder="{{ trans('template.rating.name.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input name="rating_star_email" value="{{ $form['email']}}" type="email" class="form-control" placeholder="{{ trans('template.rating.email.placeholder') }}" required @if(Auth::check()) {{'readonly'}} @endif>
+                        </div>
                     @endif
                     <div class="form-group col-md-12">
                         <textarea name="rating_star_message" class="form-control" rows="5" required placeholder="{{ trans('template.rating.message.placeholder', ['name' => $objectName]) }}"></textarea>
@@ -86,17 +86,17 @@
                         <div class="review-attach-text"><span class="btn-attach js_rating_star_insert_attach">{{ trans('template.rating.attach') }}</span></div>
                         <div class="review-attach-list">
                             <div class="review-attach-flex">
-                            @for($i = 1; $i <= 5; $i++)
-                                <div class="uploader">
-                                    <div class="input-wrapper input-wrapper--button">
-                                        <div class="input-group">
-                                            <input type="file" name="attach[]" class="input__upload" id="attach_file_{{ $i}}">
-                                            <label class="uploader-review" for="attach_file_{{ $i}}"><i class="fal fa-plus"></i></label>
-                                            <div class="remove-file"><i class="fal fa-times"></i></div>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <div class="uploader">
+                                        <div class="input-wrapper input-wrapper--button">
+                                            <div class="input-group">
+                                                <input type="file" name="attach[]" class="input__upload" id="attach_file_{{ $i}}">
+                                                <label class="uploader-review" for="attach_file_{{ $i}}"><i class="fal fa-plus"></i></label>
+                                                <div class="remove-file"><i class="fal fa-times"></i></div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endfor
+                                @endfor
                             </div>
                             <div class="clearfix"></div>
                             <div class="col-md-12">
@@ -293,7 +293,7 @@
             }
 
             if(validate === false) {
-                SkilldoMessage.error('Ảnh không đúng định dạng.');
+                SkilldoMessage.error(lang.get('rating.attach.extension'));
                 return false;
             }
 
@@ -302,7 +302,7 @@
             size = size / 1024 / 1024;
 
             if(size > 2) {
-                SkilldoMessage.error('Ảnh của bạn lớn hơn kích thước cho phép.');
+                SkilldoMessage.error(lang.get('rating.attach.size'));
                 return false;
             }
 

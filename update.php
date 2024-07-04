@@ -132,6 +132,13 @@ Class Rating_Star_Update_Database {
 
     static function version_4_6_0($model): void
     {
+
+        if(schema()->hasTable('rating_star')) {
+            schema()->table('rating_star', function (Blueprint $table) {
+                $table->dateTime('created')->default('CURRENT_TIMESTAMP')->change();
+            });
+        }
+
         $setting = Option::get('rating_star_setting');
 
         $options = model('system')::where('option_name', 'theme_option')->first();

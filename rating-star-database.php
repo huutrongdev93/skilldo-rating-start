@@ -20,7 +20,7 @@ Class Rating_Star_Database {
                 $table->integer('parent_id')->default(0);
                 $table->integer('user_id')->default(0);
                 $table->integer('order')->default(0);
-                $table->dateTime('created');
+                $table->dateTime('created')->default('CURRENT_TIMESTAMP');
                 $table->dateTime('updated')->nullable();
             });
         }

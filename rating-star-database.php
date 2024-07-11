@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Database\Capsule\Manager as DB;
+
 Class Rating_Star_Database {
 
     static public function create(): void
@@ -20,7 +22,7 @@ Class Rating_Star_Database {
                 $table->integer('parent_id')->default(0);
                 $table->integer('user_id')->default(0);
                 $table->integer('order')->default(0);
-                $table->dateTime('created')->default('CURRENT_TIMESTAMP');
+                $table->dateTime('created')->default(DB::raw('CURRENT_TIMESTAMP'));
                 $table->dateTime('updated')->nullable();
             });
         }

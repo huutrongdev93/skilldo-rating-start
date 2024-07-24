@@ -1,12 +1,4 @@
 <?php
-/**
-Plugin name     : Rating Star
-Plugin class    : rating_star
-Plugin uri      : http://sikido.vn
-Description     : Với ứng dụng Rating Star, bạn có thể thu được nhiều đánh giá hơn bất kì một cách thức nào khác. Chúng đã được duyệt kỹ lưỡng trước khi được hiển thị trên website của bạn
-Author          : Nguyễn Hữu Trọng
-Version         : 4.6.0
- */
 const RATING_STAR_NAME = 'rating-star';
 
 const RATING_STAR_VERSION = '4.6.0';

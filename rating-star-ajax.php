@@ -212,12 +212,7 @@ Class Rating_Star_Ajax {
 
                 if($has_approving == 0) {
 
-                    $rating_star_product = Metadata::get($type, $rating['object_id'], 'rating_star', true);
-
-                    if(!have_posts($rating_star_product)) {
-
-                        $rating_star_product = ['count' => 0, 'star'  => 0];
-                    }
+                    $rating_star_product = [];
 
                     $rating_star_product['count'] = RatingStar::where('object_type', $type)->where('object_id', $rating['object_id'])->amount();
 

@@ -13,6 +13,7 @@ Class AdminRatingStarSetting {
     static public function render($ci, $tab): void
     {
         $config = RatingStar::config();
+
         do_action('admin_system_rating_start_html', $config, $tab);
     }
 

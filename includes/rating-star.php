@@ -177,11 +177,7 @@ class RatingStar extends \SkillDo\Model\Model {
 
         if($config['autoDataType'] == 'auto') {
 
-            $service = 'https://cdn.sikido.vn';
-
-            $dataTemp = file_get_contents($service.'/star-ratings');
-
-            $dataTemp = (array)json_decode($dataTemp);
+            $dataTemp = (array)SKDService::cms()->ratingStartDataFake();
         }
         else {
             $dataTemp = [

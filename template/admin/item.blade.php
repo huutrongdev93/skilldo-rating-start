@@ -1,4 +1,4 @@
-<tr class="js_column tr_{{ $item->id}} js_rating_star_table_item rating-star-item {{ ($item->is_read == 0) ? 'is_read' : ''}}" data-item="{{ htmlentities(json_encode($item))}}">
+<tr class="js_column tr_{{ $item->id}} js_rating_star_table_item rating-star-item {{ ($item->is_read == 0) ? 'is_read' : ''}}" data-item="{{ htmlentities(json_encode($item->toArray()))}}">
     <td style="width:600px;" class="js_rating_star_table_review">
 		<div class="review-item-info d-flex gap-2">
 			<div class="review-item-avatar">

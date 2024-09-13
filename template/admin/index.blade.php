@@ -126,20 +126,20 @@
 				<div class="form-group">
 					<label for="" class="mb-2">Đánh giá</label>
 					<div class="d-flex gap-2">
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[star]" value="1" class="icheck js_review_input_star"> 1 Sao
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[star]" value="1" class="form-check-input js_review_input_star"> 1 Sao
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[star]" value="2" class="icheck js_review_input_star"> 2 Sao
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[star]" value="2" class="form-check-input js_review_input_star"> 2 Sao
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[star]" value="3" class="icheck js_review_input_star"> 3 Sao
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[star]" value="3" class="form-check-input js_review_input_star"> 3 Sao
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[star]" value="4" class="icheck js_review_input_star"> 4 Sao
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[star]" value="4" class="form-check-input js_review_input_star"> 4 Sao
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[star]" value="5" class="icheck js_review_input_star"> 5 Sao
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[star]" value="5" class="form-check-input js_review_input_star"> 5 Sao
 						</label>
 					</div>
 				</div>
@@ -147,14 +147,14 @@
 				<div class="form-group">
 					<label for="" class="mb-2">Trạng thái</label>
 					<div class="">
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[status]" value="pending" class="icheck js_review_input_status"> Đợi duyệt
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[status]" value="pending" class="form-check-input js_review_input_status"> Đợi duyệt
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[status]" value="public" class="icheck js_review_input_status"> Hiển thị
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[status]" value="public" class="form-check-input js_review_input_status"> Hiển thị
 						</label>
-						<label class="mb-2 w-100" style="font-weight: normal;">
-							<input type="radio" name="review[status]" value="hidden" class="icheck js_review_input_status"> Tạm ẩn
+						<label class="mb-2 w-100 form-check" style="font-weight: normal;">
+							<input type="radio" name="review[status]" value="hidden" class="form-check-input js_review_input_status"> Tạm ẩn
 						</label>
 					</div>
 				</div>
@@ -180,8 +180,8 @@
 			</div>
 			<div class="modal-footer" style="border: none;">
 				<div style="display: flex;align-items:center; justify-content:space-between;">
-					<button class="btn-icon btn btn-white" data-bs-dismiss="modal"><i class="fal fa-times"></i> Đóng</button>
-					<button id="js_rating_star_modal_confirm_btn__save" class="btn-icon btn-red" type="button">Đồng ý</button>
+					<button class="btn btn-white" data-bs-dismiss="modal"><i class="fal fa-times"></i> Đóng</button>
+					<button id="js_rating_star_modal_confirm_btn__save" class="btn btn-red" type="button">Đồng ý</button>
 				</div>
 			</div>
 		</div>
@@ -406,14 +406,22 @@
 
 				let self        = this;
 
+				let loader = SkilldoUtil.buttonLoading(element.find('button.js_reply_submit'))
+
 				let data          = element.serializeJSON();
 
 				data.parentId     = this.id;
 
 				data.action       = 'Rating_Star_Admin_Ajax::commentAdd';
 
+				loader.start()
+
 				request.post(ajax, data).then(function(response) {
+
 					SkilldoMessage.response(response);
+
+					loader.stop()
+
 					if(response.status === 'success') {
 
 						self.replyList.add({
@@ -440,6 +448,8 @@
 
 			    let self        = this;
 
+				let loader = SkilldoUtil.buttonLoading(element.find('button.js_reply_submit'))
+
 			    let data          = element.serializeJSON();
 
 			    data.parentId     = this.id;
@@ -448,7 +458,11 @@
 
 			    data.action       = 'Rating_Star_Admin_Ajax::commentEdit';
 
+				loader.start()
+
 			    request.post(ajax, data).then(function(response) {
+
+					loader.stop()
 
 				    SkilldoMessage.response(response);
 
@@ -472,6 +486,8 @@
 
 		    deleteReply(element) {
 
+				let loader = SkilldoUtil.buttonLoading(element)
+
 			    let self = this;
 
 			    let data = {
@@ -479,7 +495,11 @@
 				    id     : this.replyId
 			    };
 
+				loader.start()
+
 			    request.post(ajax, data).then(function(response) {
+
+					loader.stop()
 
 				    SkilldoMessage.response(response);
 
@@ -490,6 +510,8 @@
 					    self.btnClick.closest('.js_reply_item').remove();
 
 					    self.setModalReplyAdd();
+
+						self.modalConfirmHandle.hide();
 				    }
 			    });
 
@@ -556,15 +578,11 @@
 		    }
 
 		    clickModalConfirm(element) {
-			    element.attr('readonly', true);
-			    element.attr('disabled', true);
-			    element.html('Loading...');
-			    this.modalConfirmHandle.hide();
 			    if(this.modalAction == 'deleteReply') {
-				    return this.deleteReply();
+				    return this.deleteReply(element);
 			    }
 			    if(this.modalAction == 'delete') {
-				    return this.delete();
+				    return this.delete(element);
 			    }
 			    return false;
 		    }
@@ -656,6 +674,8 @@
 
 		    delete(element) {
 
+				let loader = SkilldoUtil.buttonLoading(element)
+
 			    let self    = this;
 
 			    let data    = {
@@ -663,13 +683,18 @@
 				    id      : this.id,
 			    }
 
+				loader.start()
+
 			    request.post(ajax, data).then(function(response) {
+
+					loader.stop()
 
 				    SkilldoMessage.response(response);
 
 				    if(response.status === 'success') {
 					    self.item.remove();
 					    self.reviewModalHandle.hide()
+						self.modalConfirmHandle.hide();
 				    }
 			    });
 

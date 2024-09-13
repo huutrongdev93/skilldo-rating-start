@@ -1,9 +1,12 @@
 <?php
+
+use SkillDo\DB;
+
 class RatingStar extends \SkillDo\Model\Model {
     
-    static string $table = 'rating_star';
+    protected string $table = 'rating_star';
 
-    static array $columns = [
+    protected array $columns = [
         'name'          => ['string'],
         'email'         => ['string'],
         'title'         => ['string'],
@@ -19,82 +22,44 @@ class RatingStar extends \SkillDo\Model\Model {
         'like'          => ['int', 0],
     ];
 
-    static array $rules = [
-        'updated' => true,
-        'created' => true,
-    ];
-    
-    static function handleParams($args = null): Qr
+    const USER_CREATED_AT = 'user_id';
+
+    protected static function boot(): void
     {
-        if(is_array($args)) {
-            if(empty($args['object_type'])) {
-                $args['where']['object_type <>'] = 'comment';
-            } else {
-                $args['where']['object_type'] = $args['object_type'];
-            }
+        parent::boot();
 
-            $query = Qr::convert($args);
-        }
-        
-        if(is_numeric($args)) $query = Qr::set('id', $args);
-        
-        if($args instanceof Qr) $query = clone $args;
-        
-        return (isset($query)) ? $query : new Qr;
-    }
+        static::deleted(function (RatingStar $wheel, $listRemoveId, $objects) {
 
-    static function insert($insertData = [], object|null $oldObject = null): int|SKD_Error
-    {
-        if(empty($insertData['user_id']) && Auth::check()) {
-            $insertData['user_id'] = Auth::userID();
-        }
+            foreach ($objects as $object) {
 
-        return parent::insert($insertData, $oldObject);
-    }
+                if($object->object_type != 'comment') {
 
-    static function deleteById($id = ''): array|int
-    {
-        $model = model(static::$table);
+                    $count_rating_star = Metadata::get($object->object_type, $object->object_id, $wheel->getTable(), true);
 
-        $rating_star = static::get($id);
+                    if (!have_posts($count_rating_star))
+                    {
+                        $count_rating_star = array('count' => 0, 'star' => 0);
+                    }
+                    else
+                    {
+                        $count_rating_star['count'] = $count_rating_star['count'] - 1;
+                        $count_rating_star['star'] = $count_rating_star['star'] - $object->star;
+                    }
 
-        if(have_posts($rating_star)) {
+                    if ($object->status == 'public') {
+                        Metadata::update($object->object_type, $object->object_id, $wheel->getTable(), $count_rating_star);
+                    }
 
-            if($rating_star->object_type != 'comment') {
+                    DB::table($wheel->getTable())->where('object_type', 'comment')->where('parent_id', $object->id)->delete();
 
-                $count_rating_star = Metadata::get($rating_star->object_type, $rating_star->object_id, static::$table, true);
-
-                if (!have_posts($count_rating_star)) {
-                    $count_rating_star = array('count' => 0, 'star' => 0);
-                } else {
-                    $count_rating_star['count'] = $count_rating_star['count'] - 1;
-                    $count_rating_star['star'] = $count_rating_star['star'] - $rating_star->star;
                 }
-
-                if ($rating_star->status == 'public') {
-
-                    Metadata::update($rating_star->object_type, $rating_star->object_id, static::$table, $count_rating_star);
-                }
-
-                model(static::$table)::delete(Qr::set('object_type', 'comment')->where('parent_id', $id));
             }
-
-            $model->table(static::$table)::delete(Qr::set($id));
-
-            return [$id];
-        }
-
-        return 0;
+        });
     }
 
-    static function deleteList($productID = []) {
-        if(have_posts($productID)) {
-            foreach ($productID as $id) {
-                static::deleteById($id);
-            }
-            return $productID;
-        }
-        return false;
+    static function deleteById($id): array|int
+    {
+        return static::whereKey($id)->remove();
     }
 
     static function config($key = '') {

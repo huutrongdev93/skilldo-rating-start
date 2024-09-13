@@ -157,7 +157,7 @@ Class Rating_Star_Update_Database {
             'option_value' => serialize($options)
         ]);
 
-        CacheHandler::delete('system');
+        \SkillDo\Cache::delete('system');
     }
 }
 

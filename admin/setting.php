@@ -110,19 +110,18 @@ Class AdminRatingStarSetting {
         ]);
     }
 
-    static public function save($result, $data) {
+    static public function save(SkillDo\Http\Request $request) {
 
-        if(isset($data['rating_star_setting'])) {
+        if($request->has('rating_star_setting')) {
 
-            $dataSetting = $data['rating_star_setting'];
+            $dataSetting = $request->input('rating_star_setting');
 
             $rating['product_enable']  = Str::clear($dataSetting['product_enable']);
             $rating['post_enable']     = Str::clear($dataSetting['post_enable']);
             $rating['has_approving']   = Str::clear($dataSetting['has_approving']);
             $rating['illegal_message'] = trim(Str::clear($dataSetting['illegal_message']));
             $rating['illegal_message'] = trim($rating['illegal_message'], ',');
-            $rating['template']        = Str::clear($dataSetting['template']);
-            $rating['reply']           = Str::clear($dataSetting['reply']);
+            //$rating['reply']           = Str::clear($dataSetting['reply']);
             $rating['auto_enable']     = Str::clear($dataSetting['auto_enable']);
             $rating['auto_min_number'] = (int)Str::clear($dataSetting['auto_min_number']);
             $rating['auto_max_number'] = (int)Str::clear($dataSetting['auto_max_number']);
@@ -131,9 +130,7 @@ Class AdminRatingStarSetting {
             $rating['auto_percent_3']  = (int)Str::clear($dataSetting['auto_percent_3']);
 
             if ($rating['auto_min_number'] > $rating['auto_max_number']) {
-                $result['message'] = 'Số đánh giá nhỏ nhất tạo ra không thể lớn hơn số đánh giá lớn nhất.';
-                $result['status'] = 'error';
-                return $result;
+                response()->error('Số đánh giá nhỏ nhất tạo ra không thể lớn hơn số đánh giá lớn nhất.');
             }
 
             $rating['autoDataType'] = Str::clear($dataSetting['autoDataType']);
@@ -141,9 +138,7 @@ Class AdminRatingStarSetting {
             if($rating['autoDataType'] == 'handmade') {
 
                 if (empty($data['handmade'])) {
-                    $result['message'] = 'Không được bỏ trống dữ liệu đánh giá mẫu';
-                    $result['status']  = 'error';
-                    return $result;
+                    response()->error('Không được bỏ trống dữ liệu đánh giá mẫu');
                 }
 
                 $dataAuto = $data['handmade'];
@@ -155,16 +150,12 @@ Class AdminRatingStarSetting {
                     $item['id'] = $key;
 
                     if(empty($item['name'])) {
-                        $result['status'] = 'error';
-                        $result['message']  = 'Không được để trống giá trị tên khách hàng';
-                        return $result;
+                        response()->error('Không được để trống giá trị tên khách hàng');
                     }
                     $item['name'] = trim(Str::clear($item['name']));
 
                     if(empty($item['message'])) {
-                        $result['status'] = 'error';
-                        $result['message']  = 'Không được để trống giá trị nhận xét của khách hàng';
-                        return $result;
+                        response()->error('Không được để trống giá trị nhận xét của khách hàng');
                     }
                     $item['message'] = trim(Str::clear($item['message']));
 
@@ -174,9 +165,7 @@ Class AdminRatingStarSetting {
                 }
 
                 if($count < 30) {
-                    $result['message'] = 'Vui lòng nhập ích nhất 30 mẫu đánh giá';
-                    $result['status']  = 'error';
-                    return $result;
+                    response()->error('Vui lòng nhập ích nhất 30 mẫu đánh giá');
                 }
 
                 file_put_contents(RATING_STAR_PATH.'/assets/auto-data.json', json_encode($dataAuto));
@@ -184,8 +173,6 @@ Class AdminRatingStarSetting {
 
             Option::update('rating_star_setting', $rating);
         }
-
-        return $result;
     }
 }
 
@@ -193,4 +180,4 @@ add_filter('skd_system_tab' , 'AdminRatingStarSetting::register', 20);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderDefault', 10);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderAuto', 30);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderAutoData', 40);
-add_filter('admin_system_rating_star_save', 'AdminRatingStarSetting::save',10,2);
+add_action('admin_system_rating_star_save', 'AdminRatingStarSetting::save',10);

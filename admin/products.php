@@ -1,4 +1,7 @@
 <?php
+
+use SkillDo\DB;
+
 Class Rating_Star_Admin_Product {
     static function randomRatingStar($id, $module): void
     {
@@ -20,9 +23,9 @@ Class Rating_Star_Admin_Product {
 
                     if(!is_skd_error($error)) {
 
-                        $model = model('rating_star');
-
-                        $model::where('id',$error)->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))]);
+                        DB::table('rating_star')
+                            ->where('id',$error)
+                            ->update(['created' => date('Y-m-d H:i:s', time() - rand(0, 30)*24*rand(50, 60)*rand(0, 60))]);
 
                         $rating_star_product = Product::getMeta($id, 'rating_star', true);
 

@@ -50,44 +50,6 @@ Class AdminRatingStarSetting {
         ]);
     }
 
-    static public function renderTemplate($config): void
-    {
-        $form = form();
-        $form
-            ->selectImg('rating_star_setting[template]', [
-                'template1' => [
-                    'label' => 'Template 1',
-                    'img'   => 'https://user-images.githubusercontent.com/86478092/126191091-cd97efd1-bb86-4da2-b8a5-879525e43246.png'
-                ],
-                'template2' => [
-                    'label' => 'Template 2',
-                    'img'   => 'https://user-images.githubusercontent.com/86478092/126294849-30c1d7ef-9661-4e90-92a3-8447248732d4.png'
-                ],
-                'template3' => [
-                    'label' => 'Template 3',
-                    'img'   => 'https://user-images.githubusercontent.com/86478092/126294849-30c1d7ef-9661-4e90-92a3-8447248732d4.png'
-                ]
-            ], [
-                'label' => 'Loại giao diện',
-            ], (!empty($config['template'])) ? $config['template'] : 'template2');
-
-        $form
-            ->radio('rating_star_setting[reply]',  [
-                'all' => 'Cho phép tất cả mọi người trả lời',
-                'login' => 'Chỉ cho phép thành viên',
-                'admin' => 'Chỉ cho phép admin trả lời'
-            ], [
-                'label' => 'Trả lời đánh giá',
-            ], (!empty($config['reply'])) ? $config['reply'] : 'all');
-
-
-        Admin::view('components/system-default', [
-            'title'       => 'Giao diện',
-            'description' => 'Quản lý loại đánh giá',
-            'form'        => $form
-        ]);
-    }
-
     static public function renderAuto($config): void {
         $form = form();
         $form->switch('rating_star_setting[auto_enable]', [
@@ -159,14 +121,13 @@ Class AdminRatingStarSetting {
             $rating['has_approving']   = Str::clear($dataSetting['has_approving']);
             $rating['illegal_message'] = trim(Str::clear($dataSetting['illegal_message']));
             $rating['illegal_message'] = trim($rating['illegal_message'], ',');
-            $rating['reply']           = Str::clear($dataSetting['reply']);
+            //$rating['reply']           = Str::clear($dataSetting['reply']);
             $rating['auto_enable']     = Str::clear($dataSetting['auto_enable']);
             $rating['auto_min_number'] = (int)Str::clear($dataSetting['auto_min_number']);
             $rating['auto_max_number'] = (int)Str::clear($dataSetting['auto_max_number']);
             $rating['auto_percent_5']  = (int)Str::clear($dataSetting['auto_percent_5']);
             $rating['auto_percent_4']  = (int)Str::clear($dataSetting['auto_percent_4']);
             $rating['auto_percent_3']  = (int)Str::clear($dataSetting['auto_percent_3']);
-            $rating['template']        = Str::clear($dataSetting['template']);
 
             if ($rating['auto_min_number'] > $rating['auto_max_number']) {
                 response()->error('Số đánh giá nhỏ nhất tạo ra không thể lớn hơn số đánh giá lớn nhất.');
@@ -176,11 +137,11 @@ Class AdminRatingStarSetting {
 
             if($rating['autoDataType'] == 'handmade') {
 
-                if (empty($data['handmade'])) {
+                if (empty($request->input('handmade'))) {
                     response()->error('Không được bỏ trống dữ liệu đánh giá mẫu');
                 }
 
-                $dataAuto = $data['handmade'];
+                $dataAuto = $request->input('handmade');
 
                 $count = 0;
 
@@ -217,7 +178,6 @@ Class AdminRatingStarSetting {
 
 add_filter('skd_system_tab' , 'AdminRatingStarSetting::register', 20);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderDefault', 10);
-add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderTemplate', 20);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderAuto', 30);
 add_action('admin_system_rating_start_html', 'AdminRatingStarSetting::renderAutoData', 40);
 add_action('admin_system_rating_star_save', 'AdminRatingStarSetting::save',10);

@@ -1,7 +1,7 @@
 <?php
 const RATING_STAR_NAME = 'rating-star';
 
-const RATING_STAR_VERSION = '4.6.0';
+const RATING_STAR_VERSION = '4.6.4';
 
 define('RATING_STAR_PATH',  Path::plugin(RATING_STAR_NAME));
 

@@ -24,7 +24,7 @@ Class AdminRatingStar {
 
     static public function page(): void
     {
-        model('rating_star')::where('is_read', 0)->update(['is_read' => 1]);
+        \SkillDo\DB::table('rating_star')->where('is_read', 0)->update(['is_read' => 1]);
 
 		Plugin::view(RATING_STAR_NAME, 'admin/index');
     }

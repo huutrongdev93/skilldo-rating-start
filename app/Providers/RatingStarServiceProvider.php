@@ -15,8 +15,15 @@ class RatingStarServiceProvider extends ServiceProvider
     {
         $configOption = Option::get('rating_star_setting');
 
+        $themeOption = Option::get('rating_star_style');
+
         $this->mergeConfig($configOption, 'rating-star::config');
 
-        $this->mergeConfig($configOption, 'rating-star::theme');
+        if(empty($themeOption['item_position']))
+        {
+            $themeOption['item_position'] = 45;
+        }
+
+        $this->mergeConfig($themeOption, 'rating-star::theme');
     }
 }

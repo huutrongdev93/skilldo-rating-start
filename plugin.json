@@ -4,7 +4,7 @@
     "url":"https://sikido.vn",
     "description":"Với ứng dụng Rating Star, bạn có thể thu được nhiều đánh giá hơn bất kì một cách thức nào khác. Chúng đã được duyệt kỹ lưỡng trước khi được hiển thị trên website của bạn",
     "author":"Nguyễn Hữu Trọng",
-    "version":"5.0.0",
+    "version":"5.0.1",
     "thumb": "assets/thumb.png",
     "providers": [
         "RatingStar\\Providers\\RatingStarServiceProvider"

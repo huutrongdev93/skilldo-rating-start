@@ -30,4 +30,4 @@ add_action('view_post_detail_after', [RatingStarPost::class, 'form'], 99);
 */
 add_action('product_detail_tabs', [RatingStarProduct::class, 'form'], 30);
 add_action('product_detail_info', [RatingStarProduct::class, 'detail'], 6);
-add_action('product_object_info', [RatingStarProduct::class, 'object'], config('rating-star::theme.item_position'));
+add_action('product_object_info', [RatingStarProduct::class, 'object'], config('rating-star::theme.item_position') ?? 45);

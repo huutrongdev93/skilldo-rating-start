@@ -1,6 +1,8 @@
 <?php
 namespace RatingStar\Modules\Web;
 
+use RatingStar\Supports\RatingStarHelper;
+
 Class RatingStarProduct
 {
     static function data($id): array
@@ -11,7 +13,7 @@ Class RatingStarProduct
 
         $numberReview  = (isset($data['count'])) ? $data['count'] : 0;
 
-        $avgStar = (!empty($numberReview)) ? round($totalStar/$numberReview) : 5;
+        $avgStar = RatingStarHelper::avgStar($totalStar, $numberReview, 5);
 
         return compact('totalStar', 'numberReview', 'avgStar');
     }
@@ -60,8 +62,6 @@ Class RatingStarProduct
                 'email' => '',
             ]
         ];
-
-        if($data['count'] != 0) $data['star'] = round($data['star']/$data['count']);
 
         echo view('rating-star::'.config('rating-star::theme.template'), $data);
 

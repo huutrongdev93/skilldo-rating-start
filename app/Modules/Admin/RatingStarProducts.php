@@ -57,7 +57,7 @@ Class RatingStarProducts
 
         $numberReview = (isset($ratingStarData['count'])) ? $ratingStarData['count'] : 0;
 
-        $averageStar = (!empty($numberReview)) ? round($totalStar/$numberReview) : 0;
+        $averageStar = RatingStarHelper::avgStar($totalStar, $numberReview, 0);
 
         echo view('rating-star::admin/products/title-star', [
             'item' => $item,

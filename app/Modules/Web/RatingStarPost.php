@@ -1,6 +1,7 @@
 <?php
 namespace RatingStar\Modules\Web;
 
+use RatingStar\Supports\RatingStarHelper;
 use SkillDo\Cms\Models\Post;
 use SkillDo\Cms\Support\Cms;
 use SkillDo\Cms\Support\Theme;
@@ -15,7 +16,7 @@ Class RatingStarPost
 
         $numberReview  = (isset($data['count'])) ? $data['count'] : 0;
 
-        $avgStar = (!empty($numberReview)) ? round($totalStar/$numberReview) : 0;
+        $avgStar = RatingStarHelper::avgStar($totalStar, $numberReview, 0);
 
         return compact('totalStar', 'numberReview', 'avgStar');
     }
@@ -38,7 +39,7 @@ Class RatingStarPost
                     'type'       => 'post',
                     'objectName' => 'bài viết',
                     'object'     => $object,
-                    'star'       => $totalStar,
+                    'star'       => $avgStar,
                     'avgStar'    => $avgStar,
                     'count'      => $numberReview,
                     'form' => [

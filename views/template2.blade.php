@@ -2,14 +2,9 @@
     <div class="rating-star-review">
         <div class="rsr__left">
             <div class="review__info">
-                <span class="number">{{ $star }}.0</span>
+                <span class="number">{{ number_format($star, 1) }}</span>
                 <span class="star">
-                    @for( $i = 0; $i < $star; $i++ )
-                        <i class="fal fa-star" aria-hidden="true" style="color:var(--star-color); font-weight: bold;"></i>&nbsp;
-                    @endfor
-                    @for( $i = 0; $i < (5 - $star); $i++ )
-                        <i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i>&nbsp;
-                    @endfor
+                    @include('partials.star-icon', ['star' => $star])
                 </span>
                 <span class="text">{{ $count }} {{ trans('rating-star::template.rate') }}</span>
             </div>

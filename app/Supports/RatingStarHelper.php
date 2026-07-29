@@ -164,6 +164,32 @@ class RatingStarHelper
         return $dataRandom;
     }
 
+    /**
+     * Điểm trung bình, giữ 1 chữ số thập phân (vd: 4.5)
+     * $totalStar là tổng điểm cộng dồn, $numberReview là số lượt đánh giá
+     */
+    static function avgStar($totalStar, $numberReview, $default = 5): float
+    {
+        if (empty($numberReview)) return (float)$default;
+
+        return round($totalStar / $numberReview, 1);
+    }
+
+    /**
+     * Tách điểm trung bình thành số sao đầy / nửa / rỗng để render
+     * Điểm được làm tròn tới 0.5 (4.3 -> 4.5 sao, 4.2 -> 4 sao)
+     */
+    static function starParts($star): array
+    {
+        $star = round(max(0, min(5, (float)$star)) * 2) / 2;
+
+        $full   = (int)floor($star);
+        $half   = ($star - $full >= 0.5) ? 1 : 0;
+        $empty  = 5 - $full - $half;
+
+        return compact('full', 'half', 'empty');
+    }
+
     static function starLabel($star = 1) {
         $label = [
             1 => 'Rất không hài lòng',

@@ -44,7 +44,7 @@
                         </div>
                         @endif
                         <div class="form-group col-md-12 mt-2">
-                            <button type="submit" class="btn btn-theme btn-effect-default d-block w-100">{{ trans('general.send')  }}</button>
+                            <button type="submit" class="btn btn-theme btn-effect-default d-block w-100">{{ trans('rating-star::template.send')  }}</button>
                         </div>
                     </div>
                 </form>

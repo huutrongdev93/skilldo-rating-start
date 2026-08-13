@@ -9,4 +9,10 @@ return [
     'attach' => 'Gửi ảnh thực tế',
     'attach.rule' => 'Chỉ chấp nhận JPEG, JPG, PNG. Dung lượng không quá 2Mb mỗi hình',
     'voted' => 'bình chọn',
+    /*
+    | Nút gửi của form đánh giá. Trước đây 3 view gọi trans('general.send') KHÔNG namespace
+    | — khoá đó chỉ tồn tại ở scope theme:: nên plugin in ra nguyên chuỗi "general.send".
+    | Plugin tự mang bản dịch của mình, không mượn scope của theme.
+    */
+    'send' => 'Gửi',
 ];

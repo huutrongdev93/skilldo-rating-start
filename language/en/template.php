@@ -9,4 +9,9 @@ return [
     'attach' => 'Send actual photo',
     'attach.rule' => 'Only accept JPEG, JPG, PNG. Capacity not more than 2Mb per image',
     'voted' => 'voted',
+    /*
+    | Nút gửi của form đánh giá — xem chú thích ở bản vi: không mượn khoá general.send
+    | của theme nữa vì plugin không có scope đó.
+    */
+    'send' => 'Send',
 ];

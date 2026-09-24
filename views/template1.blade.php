@@ -288,7 +288,7 @@
             }
 
             if(validate === false) {
-                SkilldoMessage.error(lang.get('rating.attach.extension'));
+                SkilldoMessage.error(lang.get('rating-star.rating.attach.extension'));
                 return false;
             }
 
@@ -297,7 +297,7 @@
             size = size / 1024 / 1024;
 
             if(size > 2) {
-                SkilldoMessage.error(lang.get('rating.attach.size'));
+                SkilldoMessage.error(lang.get('rating-star.rating.attach.size'));
                 return false;
             }
 

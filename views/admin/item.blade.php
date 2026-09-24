@@ -52,7 +52,7 @@
             <div class="attach-images">
                 @foreach ($files as $path => $file)
                     <div class="images"><a href="{{ Url::base($path)}}"
-                                           data-fancybox="group">{!! Template::img(Url::base($path))!!}</a></div>
+                                           data-fancybox="group">{!! Image::source(Url::base($path))->html()!!}</a></div>
                 @endforeach
             </div>
         @else

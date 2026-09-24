@@ -52,6 +52,9 @@ File này giúp agent hiểu ngay cấu trúc plugin mà không cần scan lại
 - `do_action('rating_star_save_success', $id, $rating)` — sau khi tạo review.
 - `apply_filters('rating_start_register', [...])` — đăng ký thêm loại object có thể review (⚠️ tên hook typo "start" thay vì "star" — GIỮ NGUYÊN, đổi sẽ gãy tương thích).
 
+> 5.0.5 (24/09/2026, chuyển từ instance 1mongolianbbq): ảnh đính kèm trong `review-item` và `admin/item` dùng
+> `Image::source(...)->html()` thay `Template::img()` (làm mất alt, sắp bị khai tử). Không dùng lại `Template::img()`.
+
 ## Quy tắc khi sửa
 
 1. Đổi status/xóa review luôn phải **đồng bộ metadata tổng hợp** `rating_star` (count/star) trên object gốc — xem cách `status()`/model boot deleted làm.

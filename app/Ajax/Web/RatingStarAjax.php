@@ -85,7 +85,7 @@ class RatingStarAjax
 
             response()->success(trans('ajax.load.success'), [
                 'pagination' => '',
-                'review' => Admin::alert('warning', trans('rating-star::messages.review.empty')),
+                'review' => '<p class="text-center" style="color:#888">'.trans('rating-star::messages.review.empty').'</p>',
             ]);
         }
 
@@ -115,6 +115,11 @@ class RatingStarAjax
             $module = RatingStarHelper::module($type);
 
             if(empty($module))
+            {
+                response()->error(trans('rating-star::messages.review.module.notFound'));
+            }
+
+            if(($type == 'products' && empty(config('rating-star::config.product_enable'))) || ($type == 'post' && empty(config('rating-star::config.post_enable'))))
             {
                 response()->error(trans('rating-star::messages.review.module.notFound'));
             }
@@ -184,9 +189,11 @@ class RatingStarAjax
                 response()->error(trans('rating-star::messages.review.message.empty'));
             }
 
-            if(!empty($illegal_message))
+            $illegal_message = trim((string)config('rating-star::config.illegal_message'));
+
+            if($illegal_message !== '')
             {
-                $illegal_message = explode(',', config('rating-star::config.illegal_message'));
+                $illegal_message = explode(',', $illegal_message);
 
                 if (hasItems($illegal_message))
                 {
@@ -315,9 +322,11 @@ class RatingStarAjax
                 response()->error(trans('rating-star::messages.review.message.empty'));
             }
 
-            if(!empty($illegal_message))
+            $illegal_message = trim((string)config('rating-star::config.illegal_message'));
+
+            if($illegal_message !== '')
             {
-                $illegal_message = explode(',', config('rating-star::config.illegal_message'));
+                $illegal_message = explode(',', $illegal_message);
                 if (hasItems($illegal_message))
                 {
                     foreach ($illegal_message as $illegal)
@@ -346,7 +355,7 @@ class RatingStarAjax
 
             if(!is_skd_error($id))
             {
-                response()->success(trans('rating-star::rating.reply.success'));
+                response()->success(trans('rating-star::messages.reply.success'));
             }
         }
 
@@ -369,7 +378,7 @@ class RatingStarAjax
 
             if(!is_skd_error($id))
             {
-                response()->error(trans('ajax.save.success'));
+                response()->success(trans('ajax.save.success'));
             }
         }
 

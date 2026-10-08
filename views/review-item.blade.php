@@ -10,7 +10,7 @@
             <div class="rvc_user-info">
                 <div class="rvc_user-name">
                     <span>{{ $review->name }}</span>
-                    @if($type == 'products')
+                    @if($type == 'products' && \RatingStar\Supports\RatingStarHelper::hasPurchased($review))
                         <div class="rvc_user-seller"><i class="fal fa-check"></i> {{ trans('rating-star::review.seller') }}
                         </div>
                     @endif

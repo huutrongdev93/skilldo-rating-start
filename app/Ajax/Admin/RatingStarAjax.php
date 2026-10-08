@@ -149,8 +149,6 @@ class RatingStarAjax
             'comment.name' => Rule::make('Tên người trả lời')->notEmpty(),
             'comment.email' => Rule::make('Email người trả lời')->notEmpty()->email(),
             'comment.content' => Rule::make('câu trả lời của bạn')->notEmpty()->string()->min(10),
-            'comment.star' => Rule::make('Điểm đánh giá')->notEmpty()->integer()->min(1)->max(5),
-            'comment.status' => Rule::make('Trạng thái cần cập nhật')->notEmpty(),
             'parentId' => Rule::make('id đánh giá')->notEmpty()->integer(),
         ]);
 
@@ -207,8 +205,6 @@ class RatingStarAjax
             'comment.name' => Rule::make('Tên người trả lời')->notEmpty(),
             'comment.email' => Rule::make('Email người trả lời')->notEmpty()->email(),
             'comment.content' => Rule::make('câu trả lời của bạn')->notEmpty()->string()->min(10),
-            'comment.star' => Rule::make('Điểm đánh giá')->notEmpty()->integer()->min(1)->max(5),
-            'comment.status' => Rule::make('Trạng thái cần cập nhật')->notEmpty(),
             'id' => Rule::make('id câu trả lời')->notEmpty()->integer(),
         ]);
 
@@ -296,7 +292,7 @@ class RatingStarAjax
                 {
                     $rating_star_product = ['count' => 0, 'star' => 0];
                 }
-                else
+                else if($ratingStar->status == 'public')
                 {
                     $rating_star_product['count'] = $rating_star_product['count'] - 1;
                     $rating_star_product['star'] = $rating_star_product['star'] - $ratingStar->star;
@@ -399,16 +395,17 @@ class RatingStarAjax
                 $ratingStarTotal = ['count' => 0, 'star' => 0];
             }
 
-            if($data['star'] != $ratingStar->star && $ratingStar->status == 'public')
-            {
-                $ratingStarTotal['star'] -= $ratingStar->star;
-                $ratingStarTotal['star'] += $data['star'];
-            }
-
-            if($ratingStar->status == 'public' && $data['status'] != 'public')
+            // Bỏ phần đóng góp cũ (nếu đang hiển thị) rồi cộng phần mới (nếu sau khi lưu còn hiển thị)
+            if($ratingStar->status == 'public')
             {
                 $ratingStarTotal['count'] -= 1;
-                $ratingStarTotal['star'] -= $data['star'];
+                $ratingStarTotal['star'] -= $ratingStar->star;
+            }
+
+            if($data['status'] == 'public')
+            {
+                $ratingStarTotal['count'] += 1;
+                $ratingStarTotal['star'] += (int)$data['star'];
             }
 
             $ratingStar->star  = Str::clear($data['star']);

@@ -6,6 +6,7 @@ return [
     'name.placeholder' => 'Your full name',
     'email.placeholder' => 'Your email',
     'message.placeholder' => 'Please share what you like about this product',
+    'write' => 'Write a review',
     'attach' => 'Send actual photo',
     'attach.rule' => 'Only accept JPEG, JPG, PNG. Capacity not more than 2Mb per image',
     'voted' => 'voted',

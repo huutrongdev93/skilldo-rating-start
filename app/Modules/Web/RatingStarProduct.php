@@ -13,13 +13,15 @@ Class RatingStarProduct
 
         $numberReview  = (isset($data['count'])) ? $data['count'] : 0;
 
-        $avgStar = RatingStarHelper::avgStar($totalStar, $numberReview, 5);
+        $avgStar = RatingStarHelper::avgStar($totalStar, $numberReview, 0);
 
         return compact('totalStar', 'numberReview', 'avgStar');
     }
 
     static function object($object): void
     {
+        if(empty(config('rating-star::config.product_enable'))) return;
+
         [
             'totalStar'     => $totalStar,
             'numberReview'  => $numberReview,
@@ -30,6 +32,8 @@ Class RatingStarProduct
     }
 
     static function detail($object): void {
+        if(empty(config('rating-star::config.product_enable'))) return;
+
 
         [
             'totalStar'     => $totalStar,
@@ -45,6 +49,8 @@ Class RatingStarProduct
 
     static function form($object): void
     {
+        if(empty(config('rating-star::config.product_enable'))) return;
+
         [
             'totalStar'     => $totalStar,
             'numberReview'  => $numberReview,

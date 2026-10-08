@@ -8,6 +8,6 @@ return [
     'review.message.empty' => 'Nội dung đánh giá quá ngắn',
     'review.message.illegal' => 'Xin lỗi, Nội dung đánh giá có chứa từ không được phép sử dụng',
     'review.star.illegal' => 'Số sao đánh giá không hợp lệ',
-    'review.success' => 'Cám ơn bạn đã gửi đanh giá cho chúng tôi',
+    'review.success' => 'Cám ơn bạn đã gửi đánh giá cho chúng tôi',
     'reply.success' => 'Đăng câu trả lời thành công',
 ];

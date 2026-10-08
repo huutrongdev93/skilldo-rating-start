@@ -190,6 +190,32 @@ class RatingStarHelper
         return compact('full', 'half', 'empty');
     }
 
+    /**
+     * Người đánh giá có đơn hàng (không bị hủy) chứa sản phẩm này không.
+     * Khớp theo tài khoản (customer_id) hoặc email đã dùng khi đặt hàng.
+     */
+    static function hasPurchased($review): bool
+    {
+        if(!class_exists(\Ecommerce\Models\Order::class)) return false;
+
+        $userId = (int)($review->user_id ?? 0);
+
+        $email  = trim((string)($review->email ?? ''));
+
+        if($userId <= 0 && $email === '') return false;
+
+        $query = \Illuminate\Support\Facades\DB::table('order_detail')
+            ->join('order', 'order.id', '=', 'order_detail.order_id')
+            ->where('order_detail.product_id', (int)$review->object_id)
+            ->where('order.status', '<>', 'cancelled')
+            ->where(function ($q) use ($userId, $email) {
+                if($userId > 0) $q->orWhere('order.customer_id', $userId);
+                if($email !== '') $q->orWhere('order.email', $email);
+            });
+
+        return $query->exists();
+    }
+
     static function starLabel($star = 1) {
         $label = [
             1 => 'Rất không hài lòng',

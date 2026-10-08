@@ -23,7 +23,7 @@ Class RatingStarPost
 
     static function form($content)
     {
-        if(Theme::isPage('post_detail'))
+        if(!empty(config('rating-star::config.post_enable')) && Theme::isPage('post_detail'))
         {
             $object = Cms::getData('object');
 

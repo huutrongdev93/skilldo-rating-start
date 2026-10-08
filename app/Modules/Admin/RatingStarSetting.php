@@ -57,7 +57,7 @@ Class RatingStarSetting
         echo Component::blockSystem(function (BlockSystem $blockSystem) use ($form)
         {
             $blockSystem->wrapper()->setClass('mb-3');
-            $blockSystem->header('Cấu hình chung')->description('Quản lý màu sắc hệ thống admin');
+            $blockSystem->header('Cấu hình chung')->description('Bật, tắt đánh giá và các thiết lập chung');
             $blockSystem->content($form);
         });
     }

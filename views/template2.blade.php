@@ -38,7 +38,7 @@
             <div class="row">
                 <div class="form-group col-md-12 text-center">
                     <p class="text-center"><span class="text">{{ trans('rating-star::template.rate.count', ['count' => $count]) }}</span></p>
-                    <button type="button" class="btn btn-theme btn-effect-default btn-block js_rating_star_btn__review">{{ trans('rating-star::template.attach') }}</button>
+                    <button type="button" class="btn btn-theme btn-effect-default btn-block js_rating_star_btn__review">{{ trans('rating-star::template.write') }}</button>
                 </div>
             </div>
         </div>

@@ -584,10 +584,12 @@
 		.review-comments_sort {
 			ul {
 				li {
-					font-size: 10px;
+					font-size: 12px;
 					&:first-child { display: none; }
 					&.star {
-						padding:5px 10px;
+						// WD-109: vùng chạm tối thiểu 40px trên điện thoại
+						display: inline-flex; align-items: center; min-height: 40px;
+						padding:5px 12px;
 						border-radius: 5px;
 						i { padding-left: 5px; }
 						&.active {

@@ -613,13 +613,16 @@
     top: 10px;
   }
   .review-comments .review-comments_sort ul li {
-    font-size: 10px;
+    font-size: 12px;
   }
   .review-comments .review-comments_sort ul li:first-child {
     display: none;
   }
   .review-comments .review-comments_sort ul li.star {
-    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 5px 12px;
     border-radius: 5px;
   }
   .review-comments .review-comments_sort ul li.star i {

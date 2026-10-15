@@ -9,7 +9,7 @@
             <li><span>{{ trans('rating-star::review.sort') }}:</span></li>
             <li class="star active" data-sort=""><span>{{ trans('rating-star::review.sort.all') }}</span></li>
             @for($i =1; $i <= 5; $i++)
-            <li class="star" data-sort="{{ $i }}-star"><span>{{ $i }}</span><i class="fas fa-star" aria-hidden="true" style="color:#ccc;"></i></li>
+            <li class="star" data-sort="{{ $i }}-star"><span>{{ $i }}</span><i class="fas fa-star" aria-hidden="true" style="color:var(--star-empty-color, #ccc);"></i></li>
             @endfor
         </ul>
     </div>

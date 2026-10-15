@@ -8,7 +8,8 @@
     $parts      = \RatingStar\Supports\RatingStarHelper::starParts($star ?? 0);
     $prefix     = $prefix ?? 'fal';
     $color      = $color ?? 'var(--star-color)';
-    $emptyColor = $emptyColor ?? '#ccc';
+    // WD-120: sao rỗng đọc biến (theme nền tối đặt --star-empty-color), mặc định #ccc như cũ
+    $emptyColor = $emptyColor ?? 'var(--star-empty-color, #ccc)';
 @endphp
 @for( $i = 0; $i < $parts['full']; $i++ )
     <i class="{{ $prefix }} fa-star" aria-hidden="true" style="color:{{ $color }}; font-weight: bold;"></i>&nbsp;

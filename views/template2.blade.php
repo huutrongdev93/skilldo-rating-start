@@ -65,31 +65,31 @@
                     <div class="rating">
                         <label class="selected">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
-                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
+                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" style="stroke: var(--star-color, #FFB500)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                             </svg>
                             <input type="radio" name="rating" value="5" title="5 stars" checked> 5
                         </label>
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
-                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
+                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" style="stroke: var(--star-color, #FFB500)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                             </svg>
                             <input type="radio" name="rating" value="4" title="4 stars"> 4
                         </label>
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
-                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
+                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" style="stroke: var(--star-color, #FFB500)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                             </svg>
                             <input type="radio" name="rating" value="3" title="3 stars"> 3
                         </label>
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
-                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
+                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" style="stroke: var(--star-color, #FFB500)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                             </svg>
                             <input type="radio" name="rating" value="2" title="2 stars"> 2
                         </label>
                         <label>
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 32 32">
-                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
+                                <path fill="none" fill-rule="evenodd" stroke="#FFB500" style="stroke: var(--star-color, #FFB500)" stroke-width="1.5" d="M16 1.695l-4.204 8.518-9.401 1.366 6.802 6.631-1.605 9.363L16 23.153l8.408 4.42-1.605-9.363 6.802-6.63-9.4-1.367L16 1.695z"></path>
                             </svg>
                             <input type="radio" name="rating" value="1" title="1 star"> 1
                         </label>
@@ -244,7 +244,8 @@
     .rating_star_modal__review .rating > label:hover ~ label svg path,
     .rating_star_modal__review .rating > label.selected svg path,
     .rating_star_modal__review .rating > label.selected ~ label svg path {
-        fill: #FDD835 !important;
+        /* WD-120: theo option "Màu biểu tượng sao" (--star-color); không !important để theme con đè được */
+        fill: var(--star-color, #FDD835);
     }
     .rating-reviews__success { display: none; padding:50px 10px}
     .rating-reviews__success img { width: 50px; margin-bottom: 20px; }

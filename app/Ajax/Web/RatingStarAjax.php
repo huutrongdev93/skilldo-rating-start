@@ -366,10 +366,25 @@ class RatingStarAjax
     {
         $id = (int)$request->input('id');
 
+        if($id <= 0)
+        {
+            response()->error(trans('ajax.save.error'));
+        }
+
         $rating_star = RatingStar::get($id);
 
-        if(hasItems($rating_star))
+        // Mỗi IP chỉ được thích một đánh giá một lần (nhớ 30 ngày), tránh gọi lặp để bơm lượt thích.
+        $likeKey = 'rating_like_'.md5($request->ip().'|'.$id);
+
+        if(hasItems($rating_star) && \SkillDo\Cache\Cache::has($likeKey))
         {
+            response()->error(trans('ajax.save.error'));
+        }
+
+        if(hasItems($rating_star) && ($rating_star->status ?? 'public') === 'public')
+        {
+            \SkillDo\Cache\Cache::save($likeKey, 1, 30 * 24 * 60);
+
             $rating['id']    = $id;
 
             $rating['like']  = $rating_star->like + 1;

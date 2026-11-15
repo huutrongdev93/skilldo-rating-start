@@ -1,6 +1,7 @@
 <?php
 return [
     'review.empty' => 'Không có review nào',
+    'review.tooMany' => 'Bạn gửi quá nhiều lần, vui lòng thử lại sau ít phút',
     'review.module.notFound' => 'Loại đánh giá này chưa được đăng ký',
     'review.object.notFound' => 'Không có đối tượng để đánh giá',
     'review.name.empty' => 'Không được để trống tên của bạn',

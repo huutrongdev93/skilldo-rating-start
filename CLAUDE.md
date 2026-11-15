@@ -71,3 +71,7 @@ File này giúp agent hiểu ngay cấu trúc plugin mà không cần scan lại
 - Config `rating-star::config.reply` (all/login/admin) được dùng để giới hạn quyền trả lời nhưng **không có UI để sửa** (dòng lưu bị comment trong `RatingStarSetting::save()`:134) → luôn là `'all'`.
 - `views/review-star-post.blade.php` — view mồ côi, không nơi nào gọi.
 - `assets/auto-data.json` rỗng: nếu admin chọn `autoDataType=handmade` mà chưa lưu dữ liệu mẫu, `RatingStarHelper::random()` sẽ `array_rand()` trên mảng rỗng → lỗi khi auto-review chạy.
+
+## Đã sửa (15/11/2026)
+
+- `reviewSave` và `reviewReply`: RateLimiter theo IP, 5 lần / 10 phút mỗi loại (`RatingStarAjax::throttle`; lõi cũ chưa có thì bỏ qua). Khoá ngôn ngữ `rating-star::messages.review.tooMany`. `reviewLike` đã có giới hạn riêng từ trước (ghi chú "reviewLike gọi error khi thành công" ở trên đã lỗi thời).

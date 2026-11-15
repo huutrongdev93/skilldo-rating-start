@@ -92,9 +92,29 @@ class RatingStarAjax
         response()->error(trans('ajax.load.error'));
     }
 
+    /**
+     * Giới hạn tần suất theo IP: 5 lần / 10 phút cho mỗi loại thao tác (tính cả lần lỗi).
+     * Lõi cũ chưa có RateLimiter thì bỏ qua.
+     */
+    protected static function throttle(Request $request, string $name): void
+    {
+        if(!class_exists(\SkillDo\Support\RateLimiter::class)) return;
+
+        $key = \SkillDo\Support\RateLimiter::key('rating-star-'.$name, (string) $request->ip());
+
+        if(\SkillDo\Support\RateLimiter::tooManyAttempts($key, 5))
+        {
+            response()->error(trans('rating-star::messages.review.tooMany'));
+        }
+
+        \SkillDo\Support\RateLimiter::hit($key, 600);
+    }
+
     static function reviewSave(Request $request): void
     {
         if($request->isMethod('post')) {
+
+            static::throttle($request, 'save');
 
             if($request->hasFile('attach'))
             {
@@ -282,6 +302,8 @@ class RatingStarAjax
 
     static function reviewReply(Request $request): void
     {
+        static::throttle($request, 'reply');
+
         $data = $request->input();
 
         $id = (int)$request->input('id');

@@ -1,6 +1,7 @@
 <?php
 return [
     'review.empty' => 'No reviews available',
+    'review.tooMany' => 'Too many requests, please try again in a few minutes',
     'review.module.notFound' => 'This review type is not registered',
     'review.object.notFound' => 'No object to review',
     'review.name.empty' => 'Your name cannot be empty',

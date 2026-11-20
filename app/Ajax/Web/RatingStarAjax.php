@@ -304,11 +304,27 @@ class RatingStarAjax
     {
         static::throttle($request, 'reply');
 
+        // reviewLoad chỉ ẩn nút trả lời theo config.reply; endpoint phải tự kiểm lại,
+        // nếu không ai gọi thẳng ajax vẫn trả lời được dù cấu hình chỉ cho login/admin.
+        $replyMode = config('rating-star::config.reply');
+
+        if(($replyMode == 'login' && !Auth::check()) || ($replyMode == 'admin' && (!Auth::check() || !Auth::hasCap('loggin_admin'))))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $data = $request->input();
 
         $id = (int)$request->input('id');
 
         $rating_star = RatingStar::get($id);
+
+        // Chỉ trả lời đánh giá gốc đang hiển thị: không trả lời vào đánh giá đang chờ duyệt / ẩn,
+        // cũng không lồng reply vào reply.
+        if(hasItems($rating_star) && ($rating_star->status != 'public' || $rating_star->object_type == 'comment'))
+        {
+            response()->error(trans('rating-star::messages.review.object.notFound'));
+        }
 
         if(hasItems($rating_star))
         {

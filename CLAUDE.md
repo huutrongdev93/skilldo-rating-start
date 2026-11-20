@@ -75,3 +75,7 @@ File này giúp agent hiểu ngay cấu trúc plugin mà không cần scan lại
 ## Đã sửa (15/11/2026)
 
 - `reviewSave` và `reviewReply`: RateLimiter theo IP, 5 lần / 10 phút mỗi loại (`RatingStarAjax::throttle`; lõi cũ chưa có thì bỏ qua). Khoá ngôn ngữ `rating-star::messages.review.tooMany`. `reviewLike` đã có giới hạn riêng từ trước (ghi chú "reviewLike gọi error khi thành công" ở trên đã lỗi thời).
+
+## Đã sửa (20/11/2026, rà bảo mật)
+
+- `reviewReply` tự kiểm `config.reply` (login/admin) chứ không chỉ dựa vào việc `reviewLoad` ẩn nút; chỉ trả lời được đánh giá gốc đang `public` (không trả lời vào bản đang chờ duyệt / ẩn, không lồng reply vào reply).

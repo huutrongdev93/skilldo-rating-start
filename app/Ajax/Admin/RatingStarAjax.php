@@ -15,6 +15,12 @@ class RatingStarAjax
 {
     static function load(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $page   = $request->input('page');
 
         $limit  = $request->input('limit');
@@ -122,6 +128,12 @@ class RatingStarAjax
 
     static function commentLoad(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $id = (int)$request->input('id');
 
         $rating_star = RatingStar::find($id);
@@ -145,6 +157,12 @@ class RatingStarAjax
 
     static function commentAdd(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $validate = $request->validate([
             'comment.name' => Rule::make('Tên người trả lời')->notEmpty(),
             'comment.email' => Rule::make('Email người trả lời')->notEmpty()->email(),
@@ -201,6 +219,12 @@ class RatingStarAjax
 
     static function commentEdit(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $validate = $request->validate([
             'comment.name' => Rule::make('Tên người trả lời')->notEmpty(),
             'comment.email' => Rule::make('Email người trả lời')->notEmpty()->email(),
@@ -243,6 +267,12 @@ class RatingStarAjax
 
     static function commentDelete(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $id = (int)$request->input('id');
 
         $rating_star = RatingStar::find($id);
@@ -260,6 +290,12 @@ class RatingStarAjax
 
     static function status(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $id = (int)$request->input('id');
 
         $ratingStar = RatingStar::find($id);
@@ -356,6 +392,12 @@ class RatingStarAjax
 
     static function save(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $validate = $request->validate([
             'review.name' => Rule::make('Tên người trả lời')->notEmpty(),
             'review.email' => Rule::make('Email người trả lời')->notEmpty()->email(),
@@ -462,6 +504,12 @@ class RatingStarAjax
 
     static function delete(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $id         = (int)$request->input('id');
 
         $ratingStar = RatingStar::find($id);
@@ -478,6 +526,12 @@ class RatingStarAjax
 
     static function randomReview(Request $request): void
     {
+        // Ajax::admin() chỉ chặn ở mức loggin_admin: kiểm quyền theo chức năng.
+        if(!\SkillDo\Support\Auth::hasCap('rating_star'))
+        {
+            response()->error(trans('admin::app.categoryAccessForbidden'));
+        }
+
         $data = $request->input('data');
 
         if(!hasItems($data))
